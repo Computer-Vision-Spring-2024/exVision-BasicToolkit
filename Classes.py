@@ -219,13 +219,16 @@ class EdgeDetector:
         self.filter = ImageFilter() 
         self.edge_detectors = self.lookup.keys()
 
-    def apply_detector(self, image, edge_detector):
+    def apply_detector(self, image, edge_detector, filter_flag):
         if edge_detector.lower() not in self.edge_detectors:
             raise ValueError(f"Invalid filter type. Allowed types: {', '.join(self.edge_detectors)}")
-        image.convert_to_grayscale()
-        filtered_image = self.filter.apply_filter(image, "gaussian", 5)  
-        image.undo_action()
-        return self.lookup[edge_detector.lower()](filtered_image)
+        if filter_flag:
+            image.convert_to_grayscale()
+            current_image = self.filter.apply_filter(image, "gaussian", 5)  
+            image.undo_action()
+        else:
+            current_image = image.manipulated_img
+        return self.lookup[edge_detector.lower()](current_image)
     
     def padding_image(self, image, width, height, pad_size):
         padded_image = np.zeros((height + 2 * pad_size, width + 2 * pad_size)) 
@@ -440,7 +443,6 @@ class Image:
 
 # ---------------------------------------------------------- Image Processor -----------------------------------
                 
-
 class ImageProcessor:
     def __init__(self) -> None:
         self.__initialize_tools()
@@ -460,11 +462,11 @@ class ImageProcessor:
         image.previous_img = image.manipulated_img 
         image.manipulated_img = filtered_image
 
-    def get_edges(self, image, detector_type: str = "roberts"):
-        edged_image  = self.edge_detector.apply_detector(image, detector_type) # edged_image == [mag, direction]
+    def get_edges(self, image, detector_type: str = "roberts", filter_flag = True):
+        edged_image  = self.edge_detector.apply_detector(image, detector_type, filter_flag) # edged_image == [mag, direction]
         if len(edged_image) == 2:
             self.plot_gradient_with_orientation(edged_image)
-            return edged_image[0]    
+            return edged_image
         else:
             self.plot_gradient_mag(edged_image)
             return edged_image 

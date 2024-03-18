@@ -1,17 +1,39 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from Classes import *
+from scipy.interpolate import interp1d
+import imageio
 
 
-# image_3 = Image("old-metal-coins-19664925.jpg")
-# image_3.display()
-# image_3.convert_to_grayscale()
-# processor = ImageProcessor()
-# canny_output = processor.get_edges(image_3, "canny") # retruns data not image object 
+image_3 = Image("4-B4W5KT.jpg")
+image_3.display()
+image_3.convert_to_grayscale()
+processor = ImageProcessor()
+magnitude, gradient = processor.get_edges(image_3, "sobel_3x3", filter_flag=False) # retruns data not image object 
 
 # image_4 = Image(image_data = canny_output)
-# processor.apply_filter(image_4, "gaussian", filter_size=5) # in place operation
+# image_4.display()
 
+
+def resample_contour(contour, num_points):
+    # Calculate the cumulative distance along the contour
+    cumulative_distance = np.cumsum(np.sqrt(np.sum(np.diff(contour, axis=0)**2, axis=1)))
+    
+    # Normalize the cumulative distance to range [0, 1]
+    normalized_distance = cumulative_distance / cumulative_distance[-1]
+    
+    # Ensure that normalized_distance has the same length as contour
+    normalized_distance = np.linspace(0, 1, len(contour))
+    
+    # Create an interpolation function for each coordinate
+    interp_func_x = interp1d(normalized_distance, contour[:, 0], kind='cubic')
+    interp_func_y = interp1d(normalized_distance, contour[:, 1], kind='cubic')
+    
+    # Generate evenly spaced samples along the contour
+    t = np.linspace(0, 1, num_points)
+    resampled_contour = np.column_stack((interp_func_x(t), interp_func_y(t)))
+    
+    return resampled_contour
 
 plt.ion()
 def onmove(event):
@@ -32,11 +54,22 @@ def onpress(event):
         contour = np.array([[x, y]])
 
 def onrelease(event):
-    global drawing
+    global drawing, contour
     if event.button == 1:
         drawing = False
+        if len(contour) > 0:
+            # Resample the collected contour
+            num_points = len(contour)  # Change this number as needed
+            resampled_contour = resample_contour(contour, num_points)
 
-image = plt.imread("output.png")
+            ax.plot(resampled_contour[:, 0], resampled_contour[:, 1], 'ro')
+            
+            contour = np.array(resampled_contour, dtype=int)
+
+# image = plt.imread("output.png")
+# image = image_4.manipulated_img
+            
+image = magnitude
 fig, ax = plt.subplots()
 ax.imshow(image, cmap='gray')
 ax.axis('off')
@@ -54,4 +87,69 @@ cid3 = fig.canvas.mpl_connect('button_release_event', onrelease)
 input("Press Enter when done...")
 print(len(contour))
 
+ALPHA = 0.1  # Weight for external energy
+BETA = 0.1   # Weight for internal energy
+GAMA = 1
 
+def compute_external_energy(gradient, contour):
+    external_energy = -1 * gradient[contour[:, 1], contour[:, 0]]
+    return external_energy
+
+def compute_internal_energy(contour, alpha= 0.1, beta = 0.1):
+    E_elastic = np.zeros(len(contour))
+    E_smooth = np.zeros(len(contour))
+    for i in range(len(contour)):
+        prev_idx = i - 1 if i > 0 else len(contour) - 1
+        next_idx = i + 1 if i < len(contour) - 1 else 0
+        E_elastic[i] = abs(contour[next_idx, 0] - contour[i, 0]) + abs(contour[next_idx, 1] - contour[i, 1])
+        E_smooth[i] = abs(contour[next_idx, 0] - 2 * contour[i, 0] + contour[prev_idx, 0]) + abs(contour[next_idx, 1] - 2 * contour[i, 1] + contour[prev_idx, 1])
+    
+    internal_energy = alpha * E_elastic + beta * E_smooth
+    return internal_energy
+
+def update_contour(contour, external_energy, internal_energy, gama = 0.1):
+    total_energy = gama * external_energy +  internal_energy
+    new_contour = contour.copy()
+    for i in range(len(contour)):
+        min_energy_idx = np.argmin(total_energy)
+        new_contour[i] = contour[min_energy_idx]
+        total_energy[min_energy_idx] = np.inf  # Mark as visited
+    return new_contour
+
+
+
+frames = []
+num_iterations = 100 # You can adjust the number of iterations
+for _ in range(num_iterations):
+    print("update")
+    external_energy = compute_external_energy(magnitude, contour)
+    
+    # Compute internal energy
+    internal_energy = compute_internal_energy(contour, alpha=ALPHA, beta=BETA)
+    
+    # Update contour points
+    contour = update_contour(contour, external_energy, internal_energy, gama = GAMA)
+    
+    # Clear and redraw the plot
+    ax.clear()
+    ax.imshow(magnitude, cmap='gray')
+    ax.plot(contour[:, 0], contour[:, 1], 'ro')
+    # # plt.draw()
+    # plt.pause(0.01)  # Add a short pause to visualize the changes
+
+
+    # # Save the current frame
+    fig.canvas.draw()
+    frame = np.array(fig.canvas.renderer.buffer_rgba())
+    frames.append(frame)
+
+imageio.mimsave('snake_animation.gif', frames, fps=30)
+
+
+# fig_2, ax_2 = plt.subplots()
+# ax_2.imshow(magnitude, cmap='gray')
+# ax_2.plot(contour[:, 0], contour[:, 1], 'ro')
+# ax.axis('off')
+# plt.tight_layout()
+
+input("")
