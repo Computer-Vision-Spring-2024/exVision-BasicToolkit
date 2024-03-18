@@ -5,14 +5,15 @@ from scipy.interpolate import interp1d
 import imageio
 
 
-image_3 = Image("4-B4W5KT.jpg")
-image_3.display()
+image_3 = Image("images.jpeg") # insert the image path 
 image_3.convert_to_grayscale()
 processor = ImageProcessor()
-magnitude, gradient = processor.get_edges(image_3, "sobel_3x3", filter_flag=False) # retruns data not image object 
+magnitude = processor.get_edges(image_3, "sobel_3x3", filter_flag=False) # retruns data not image object 
 
-# image_4 = Image(image_data = canny_output)
-# image_4.display()
+image_4 = Image(image_data = magnitude)
+processor.apply_filter(image_4, "gaussian", sigma = 20)
+
+
 
 
 def resample_contour(contour, num_points):
@@ -59,17 +60,15 @@ def onrelease(event):
         drawing = False
         if len(contour) > 0:
             # Resample the collected contour
-            num_points = len(contour)  # Change this number as needed
+            num_points = len(contour) // 2   # Change this number as needed
             resampled_contour = resample_contour(contour, num_points)
 
             ax.plot(resampled_contour[:, 0], resampled_contour[:, 1], 'ro')
             
             contour = np.array(resampled_contour, dtype=int)
 
-# image = plt.imread("output.png")
-# image = image_4.manipulated_img
-            
-image = magnitude
+
+image = image_3.original_img
 fig, ax = plt.subplots()
 ax.imshow(image, cmap='gray')
 ax.axis('off')
@@ -85,71 +84,103 @@ cid3 = fig.canvas.mpl_connect('button_release_event', onrelease)
 
 
 input("Press Enter when done...")
+
 print(len(contour))
+print(contour)
+print(image_3.original_img.shape)
 
-ALPHA = 0.1  # Weight for external energy
-BETA = 0.1   # Weight for internal energy
-GAMA = 1
 
-def compute_external_energy(gradient, contour):
-    external_energy = -1 * gradient[contour[:, 1], contour[:, 0]]
-    return external_energy
+def compute_internal_energy(contour, control_idx, neighbour_pos):
+    prev_idx = control_idx - 1 if control_idx > 0 else len(contour) - 1
+    next_idx = control_idx + 1 if control_idx < len(contour) - 1 else 0
+    # if the control_pos = neighbour_pos, then i'm compute the internal energy of the control point. (how it vote to the overall energy in the contour) 
 
-def compute_internal_energy(contour, alpha= 0.1, beta = 0.1):
-    E_elastic = np.zeros(len(contour))
-    E_smooth = np.zeros(len(contour))
-    for i in range(len(contour)):
-        prev_idx = i - 1 if i > 0 else len(contour) - 1
-        next_idx = i + 1 if i < len(contour) - 1 else 0
-        E_elastic[i] = abs(contour[next_idx, 0] - contour[i, 0]) + abs(contour[next_idx, 1] - contour[i, 1])
-        E_smooth[i] = abs(contour[next_idx, 0] - 2 * contour[i, 0] + contour[prev_idx, 0]) + abs(contour[next_idx, 1] - 2 * contour[i, 1] + contour[prev_idx, 1])
-    
-    internal_energy = alpha * E_elastic + beta * E_smooth
+    # finite difference way of computation.
+    E_elastic = abs(contour[next_idx, 0] - neighbour_pos[0]) + abs(contour[next_idx, 1] - neighbour_pos[1])
+    E_smooth = abs(contour[next_idx, 0] - 2 * neighbour_pos[0] + contour[prev_idx, 0]) + abs(contour[next_idx, 1] - 2 * neighbour_pos[1] + contour[prev_idx, 1])
+
+    internal_energy = (E_elastic, E_smooth)
+
     return internal_energy
 
-def update_contour(contour, external_energy, internal_energy, gama = 0.1):
-    total_energy = gama * external_energy +  internal_energy
-    new_contour = contour.copy()
-    for i in range(len(contour)):
-        min_energy_idx = np.argmin(total_energy)
-        new_contour[i] = contour[min_energy_idx]
-        total_energy[min_energy_idx] = np.inf  # Mark as visited
-    return new_contour
+def get_neighbours_with_indices(image_gradient, loc, window_size):
+    margin = window_size // 2
+    i = loc[0] - margin
+    j = loc[1] - margin
+    i_start = max(0, i)
+    j_start = max(0, j)
+    i_end_candidate = i_start + window_size
+    i_end = np.min((image_gradient.shape[0], i_end_candidate))
+
+    j_end_candidate = j_start + window_size
+    j_end = np.min((image_gradient.shape[1], j_end_candidate))
 
 
+    neighbour_grad = image_gradient[i_start:i_end, j_start:j_end]
+
+    neighbour_indices = np.zeros_like(neighbour_grad, dtype=tuple)
+
+    for x in range(neighbour_indices.shape[0]):
+        for y in range(neighbour_indices.shape[1]):
+            neighbour_indices[x, y] = (i_start + x, j_start + y)
+
+    return neighbour_grad, neighbour_indices
+
+
+def update_contour(image_gradient ,contour, window_size ,alpha = 1, beta = 0.5 ,gama = 1):
+
+    for control_idx, control_point in enumerate(contour):
+        neighbour_grad, neighbour_indices =  get_neighbours_with_indices(image_gradient, control_point, window_size)
+        external_energy_neighbours = neighbour_grad * gama * -1 
+        internal_energy_neighbour = np.zeros_like(neighbour_grad)
+        for row in range(neighbour_indices.shape[0]):
+            for col in range(neighbour_indices.shape[1]):
+                E_elastic, E_smooth = compute_internal_energy(contour,control_idx,neighbour_indices[row,col])
+                internal_energy_neighbour[row, col] = alpha * E_elastic + beta * E_smooth
+
+
+        overall_energy_neighbours =   external_energy_neighbours + internal_energy_neighbour 
+        min_energy = np.argmin(overall_energy_neighbours)
+
+        i, j = np.unravel_index(min_energy, overall_energy_neighbours.shape)
+
+        i_actual, j_actual = neighbour_indices[i,j]
+
+        contour[control_idx] = [i_actual, j_actual]
+    return  contour 
+
+
+        
+window_size = 3
+
+ALPHA = 0.5
+BETA = 1
+GAMA = 0.2
 
 frames = []
-num_iterations = 100 # You can adjust the number of iterations
+num_iterations = 20 
+
 for _ in range(num_iterations):
     print("update")
-    external_energy = compute_external_energy(magnitude, contour)
-    
-    # Compute internal energy
-    internal_energy = compute_internal_energy(contour, alpha=ALPHA, beta=BETA)
-    
-    # Update contour points
-    contour = update_contour(contour, external_energy, internal_energy, gama = GAMA)
-    
+
+    contour = update_contour(image_4.original_img, contour, window_size, alpha=ALPHA, beta=BETA ,gama = GAMA)
+
     # Clear and redraw the plot
     ax.clear()
-    ax.imshow(magnitude, cmap='gray')
-    ax.plot(contour[:, 0], contour[:, 1], 'ro')
-    # # plt.draw()
-    # plt.pause(0.01)  # Add a short pause to visualize the changes
-
+    ax.imshow(image_3.original_img, cmap='gray')
+    ax.plot(contour[:, 0], contour[:, 1], 'ro-')
 
     # # Save the current frame
     fig.canvas.draw()
     frame = np.array(fig.canvas.renderer.buffer_rgba())
     frames.append(frame)
 
-imageio.mimsave('snake_animation.gif', frames, fps=30)
+imageio.mimsave('snake_animation.gif', frames, fps=10)
 
 
-# fig_2, ax_2 = plt.subplots()
-# ax_2.imshow(magnitude, cmap='gray')
-# ax_2.plot(contour[:, 0], contour[:, 1], 'ro')
-# ax.axis('off')
-# plt.tight_layout()
+fig_2, ax_2 = plt.subplots()
+ax_2.imshow(image_3.original_img, cmap='gray')
+ax_2.plot(contour[:, 0], contour[:, 1], 'ro')
+ax.axis('off')
+plt.tight_layout()
 
-input("")

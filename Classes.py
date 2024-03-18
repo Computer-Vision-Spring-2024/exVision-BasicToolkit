@@ -257,7 +257,7 @@ class EdgeDetector:
                 neighborhood = padded_image[i:i + kernel_size, j:j + kernel_size] # slice out the region 
                 # optimization trick  
                 if mutlipy:
-                    output_image[i, j] = np.sum(neighborhood * kernel)
+                    output_image[i ,j] = np.sum(neighborhood * kernel)
                 else:
                     output_image[i, j] = np.sum(neighborhood) * (1/normalize_value)
         return  np.clip(output_image,0,255)
@@ -406,7 +406,7 @@ class Image:
         plt.figure(figsize=(5, 5))
         plt.imshow(self.manipulated_img, cmap="gray" if not self.colored else None)
         plt.axis('off')
-        plt.show()
+        # plt.show()
 
     def reset_image(self):
         self.manipulated_img = np.copy(self.original_img)
@@ -427,7 +427,7 @@ class Image:
             plt.xlabel('Pixel Intensity')
             plt.ylabel('Frequency')
             plt.legend(bbox_to_anchor=(1.1, 0.5))
-        plt.show()
+        # plt.show()
 
     def adjust_contrast(self, factor):
         self.manipulated_img = (self.manipulated_img - 128) * factor + 128
@@ -466,7 +466,7 @@ class ImageProcessor:
         edged_image  = self.edge_detector.apply_detector(image, detector_type, filter_flag) # edged_image == [mag, direction]
         if len(edged_image) == 2:
             self.plot_gradient_with_orientation(edged_image)
-            return edged_image
+            return edged_image[0]
         else:
             self.plot_gradient_mag(edged_image)
             return edged_image 
@@ -485,14 +485,14 @@ class ImageProcessor:
         plt.figure(figsize=(5, 5))
         plt.imshow(rgb_image, cmap="gray")
         plt.axis('off')
-        plt.show()
+        # plt.show()
 
 
     def plot_gradient_mag(self,image):
         plt.figure(figsize=(5, 5))
         plt.imshow(image, cmap="gray")
         plt.axis('off')
-        plt.show()
+        # plt.show()
         
     def get_noise_types(self):
         print(list(self.noise_source.noise_types))
