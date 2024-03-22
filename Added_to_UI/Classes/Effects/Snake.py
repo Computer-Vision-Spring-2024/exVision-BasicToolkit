@@ -108,12 +108,12 @@ class Snake(QDoubleClickPushButton):
                 resampled_contour.append(next_point)
                 current_point = next_point  
         self.distances= np.sqrt(np.sum(np.diff(resampled_contour, axis=0)**2, axis=1))
-        print(self.distances[:40])
-        print(len(resampled_contour))
         distance = np.sqrt(np.sum((resampled_contour[0] - resampled_contour[-1]) ** 2))
         if distance< threshold_distance:
             resampled_contour.pop()
+        resampled_contour= resampled_contour[::4]
         return np.array(resampled_contour)
+
 
     def onmove(self, event):
         if self.drawing and event.inaxes == self.ax1:
@@ -135,7 +135,7 @@ class Snake(QDoubleClickPushButton):
             self.drawing = False
             if len(self.contour) > 0:
                 # Resample the collected contour 
-                resampled_contour = self.resample_contour(self.contour, 5)
+                resampled_contour = self.resample_contour(self.contour, 4)
                 self.ax1.plot(resampled_contour[:, 0], resampled_contour[:, 1], 'ro')
                 self.contour = np.array(resampled_contour, dtype=int)
                 
