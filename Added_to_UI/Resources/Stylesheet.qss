@@ -1,0 +1,278 @@
+QMenuBar {
+    color: white;
+    background-color: #555555;
+    padding: 2px 5px;
+}
+
+QMenuBar::item {
+    font-size: 10pt;
+}
+
+QMenuBar::item:selected {
+    background-color: #474747;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
+
+QMenuBar::item:pressed {
+    background-color: #383838;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
+
+QFrame {
+    border: 1px solid #383838;
+    background-color: #424242;
+}
+
+QWidget {
+    border-left: 1px solid #383838;
+    border-right: 1px solid #383838;
+    background-color: #535353;
+}
+
+QPushButton {
+    border: none;
+    padding: 4px;
+    color: #ffffff
+}
+
+QPushButton:hover {
+    background-color: #474747;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
+
+QPushButton:clicked {
+    background-color: #383838;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
+
+#left_bar_header_btn, #effect_menu_header_btn, #control_panel_header_btn {
+    padding: 3px;
+    border-style: none;
+    background: none;
+    text-align: right;
+}
+
+QTreeWidget {
+    border: none;
+}
+
+QTableWidget {
+    border: none;
+    color: white;
+}
+
+QTabWidget {
+    background-color: #535353;
+}
+
+QTabBar::tab {
+    border: 1px solid #454545;
+    background-color: #535353;
+    color: #a0a0a0;
+    padding: 8px 12px;
+}
+
+QTabBar::tab:selected {
+    background-color: #474747;
+    color: #ffffff;
+}
+
+QTabWidget::pane {
+    background-color: #4d4d4d;
+}
+
+QTabBar::close-button
+{
+    padding: 2px;
+    image: url(Resources/Icons/close.png)
+}
+
+QTabBar::close-button:hover
+{
+    background: #474747
+}
+
+QGroupBox:title {
+    color: white;
+}
+
+QGroupBox QLabel {
+    border: none;
+    color: white;
+}
+
+QComboBox {
+    background-color: #616161;
+    border: 1px solid #636363;
+    border-radius: 10px;
+    padding: 1px 1px 1px 3px;
+    height: 15px;
+    min-width: 6em;
+    color: #ffffff;
+}
+
+QComboBox:on {
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 25px;
+    border-left-width: 1px;
+    border-left-color: black;
+    border-left-style: solid;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
+    image: url(Resources/Icons/down-arrow.png);
+    width: 20px;
+    height: 20px;
+}
+
+QComboBox::down-arrow:on {
+    image: url(Resources/Icons/up-arrow.png);
+    width: 20px;
+    height: 20px;
+    top: 1px;
+    left: 1px;
+}
+
+QComboBox QAbstractItemView {
+    color: white;
+    border: 1px solid darkgray;
+    selection-background-color: light blue;
+}
+
+QToolBar {
+    background-color: #535353;
+    border: none;
+    border-bottom: 1px solid #636363;
+    padding: 2px;
+}
+
+QToolButton {
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 3px;
+}
+
+QToolButton:hover {
+    background-color: #474747;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
+
+QToolButton:pressed {
+    background-color: #383838;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
+
+QRadioButton {
+    border: none;
+    color: white;
+}
+
+QSlider::handle:horizontal {
+    background: #424242;
+    width: 20;
+    height: 20;
+}
+
+QSpinBox {
+    color: white;
+}
+
+QScrollBar:vertical {
+    background-color: #f0f0f0; /* Change to desired background color */
+    width: 12px; /* Width of the scroll bar */
+    margin: 16px 0 16px 0; /* Margin around the scroll bar */
+}
+
+/* Handle (thumb) of the scroll bar */
+QScrollBar::handle:vertical {
+    background-color: #c0c0c0; /* Change to desired handle color */
+    min-height: 20px; /* Minimum height of the handle */
+    border-radius: 6px;
+}
+
+/* Hover effect on the scroll bar handle */
+QScrollBar::handle:vertical:hover {
+    background-color: #a0a0a0; /* Change to desired hover color */
+}
+
+/* Scroll bar arrows */
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    border: none; /* Remove border around arrows */
+    background: none; /* Remove background of arrows */
+}
+
+QScrollBar::up-arrow:vertical {
+    image: url(Resources/Icons/up-arrow.png);
+    width: 12px; 
+    height: 12px; 
+}
+
+QScrollBar::down-arrow:vertical {
+    image: url(Resources/Icons/down-arrow.png);
+    width: 12px;
+    height: 12px;
+}
+
+/* Scroll bar handle when it's pressed */
+QScrollBar::handle:vertical:pressed {
+    background-color: #808080; /* Change to desired color when handle is pressed */
+}
+
+/* Scroll bar handle when it's disabled */
+QScrollBar::handle:vertical:disabled {
+    background-color: #e0e0e0; /* Change to desired color when handle is disabled */
+}
+
+/* Scroll bar page step (when clicking outside the handle) */
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none; /* Remove background for page step */
+}
+
+QMessageBox {
+    background-color: #555555;
+    color: white;
+    font: Montserrat;
+}
+
+QMessageBox QLabel {
+    border: none;
+    color: white;
+    font-size: 14px;
+}
+
+QMessageBox QPushButton {
+    border: none;
+    width: 30px;
+    height: 20px;
+    padding: 1px;
+    color: #ffffff
+}
+
+QMessageBox QPushButton:hover {
+    background-color: #474747;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
+
+QMessageBox QPushButton:clicked {
+    background-color: #383838;
+    border: 1px solid #636363;
+    border-radius: 2px;
+}
