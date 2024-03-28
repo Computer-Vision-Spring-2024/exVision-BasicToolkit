@@ -1041,7 +1041,7 @@ class Backend:
         if self._check_conversion() == 0:
             return
 
-        snake = Snake(self.grayscale_image, self.ui)
+        snake = Snake(self.current_image_data, self.grayscale_image, self.ui)
         # snake.attributes_updated.connect(self.update_output_image)
         # Get the output image after applying the noise
         self.output_image = snake.output_image
