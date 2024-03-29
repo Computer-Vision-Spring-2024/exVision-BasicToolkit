@@ -396,8 +396,14 @@ class Backend:
             parent = item.parent().text(0)
             # Hide all groupboxes
             self.hide_all_groupboxes()
+            # Get the image object to which the effect is applied
+            image_data = self.image_history.get(parent)
+            # If it is not the currently displayed image, set the current_image to the image of the selected effect
+            if not np.array_equal(image_data, self.current_image):
+                self.set_current_data(image_data)
             # Display the groupbox of the clicked effect
-            self.display_groupbox(parent, item)
+            self.display_groupbox(image_data, item)
+            image_data.applied_effects[file_name]["final_result"]()
         else:
             # Check if the first six characters of the item name are "Hybrid", then the selected image is hybrid image
             if file_name[:6] == "Hybrid":
@@ -412,11 +418,11 @@ class Backend:
             else:
                 self.hide_all_groupboxes()
                 if item.childCount() > 0:
+                    image_data = self.image_history.get(file_name)
                     # Loop over the children and display their groupboxes
                     for iterator in range(item.childCount()):
                         child = item.child(iterator)
-                        self.display_groupbox(file_name, child)
-                image_data = self.image_history.get(file_name)
+                        self.display_groupbox(image_data, child)
                 if image_data:
                     self.set_current_data(image_data)
                     self.is_grayscale= is_grayscale(self.current_image_data)
@@ -452,7 +458,7 @@ class Backend:
                 widget_to_hide.setVisible(False)
         self.ui.add_vertical_spacer(self.ui.scroll_area_VLayout)
 
-    def display_groupbox(self, image, effect):
+    def display_groupbox(self, image_data, effect):
         """
         Description:
             - Display the group box of the selected effect and remove the other group boxes.
@@ -461,11 +467,6 @@ class Backend:
             - The image that the effect is applied to.
             - The selected effect
         """
-        # Get the image object to which the effect is applied
-        image_data = self.image_history.get(image)
-        # If it is not the currently displayed image, set the current_image to the image of the selected effect
-        if not np.array_equal(image_data, self.current_image):
-            self.set_current_data(image_data)
         # Get the key of the selected effect in the dictionary of the group boxes of the image
         key = effect.text(0)
         self.ui.scroll_area_VLayout.insertWidget(
@@ -641,7 +642,6 @@ class Backend:
         """
         if flag == 0:
             converted_img = np.dot(to_be_coneverted_img[..., :3], [0.2989, 0.5870, 0.1140])
-            flag=1
         return converted_img
 
 
@@ -1038,22 +1038,22 @@ class Backend:
             )
             return
 
-        if self._check_conversion() == 0:
-            return
+        if self.is_grayscale == 0:
+            grayscale_image= None
+            grayscale_image= self.convert_to_grayscale(self.is_grayscale, self.grayscale_image, self.current_image_data)
+            display_grayscale_output_flag=0
+        else:
+            grayscale_image= self.grayscale_image
+            display_grayscale_output_flag=1
 
-        snake = Snake(self.current_image_data, self.grayscale_image, self.ui)
-        # snake.attributes_updated.connect(self.update_output_image)
-        # Get the output image after applying the noise
-        self.output_image = snake.output_image
+        snake = Snake(self.current_image_data, grayscale_image, display_grayscale_output_flag, self.ui)
         # UI Changes and Setters
         self.ui.scroll_area_VLayout.insertWidget(
             0, snake.snake_groupbox
         )
-        # self.current_image.add_applied_effect(snake.title, snake.attributes)
-        # self.current_image.set_output_image(self.output_image)
-        # self.update_tree()
-        # self.update_table()
-        # self.display_image(self.current_image_data, self.output_image)
+        self.current_image.add_applied_effect(snake.title, snake.attributes)
+        self.update_tree()
+        self.update_table()
 
 
     # ======================== Control Panel Functionalities =========================== #

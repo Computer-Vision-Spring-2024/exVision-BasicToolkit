@@ -54,6 +54,7 @@ class FreqFilters(QDoubleClickPushButton):
             "Cutoff_freq": self.cutoff_freq,
             "output": self.output_image,
             "groupbox": self.frequency_filter_groupbox,
+            "final_result": self.update,
         }
 
     # Methods

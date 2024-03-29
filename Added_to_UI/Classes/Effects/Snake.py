@@ -4,38 +4,42 @@ from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 from PyQt5.QtCore import pyqtSignal
 import matplotlib.pyplot as plt
 import imageio
-from Classes.Effects.EdgeDetector import EdgeDetector
 from Classes.Effects.Filter import Filter
 class Snake(QDoubleClickPushButton):
     _instance_counter = 0
     attributes_updated = pyqtSignal(np.ndarray)
 
-    def __init__(self, img_data, grayimageData, ui, parent=None, *args, **kwargs):
+    def __init__(self, img_data, grayimageData,grayscale_flag, ui, parent=None, *args, **kwargs):
         super(Snake, self).__init__(parent)
         # For naming the instances of the effect
         Snake._instance_counter += 1
         self.title = f"Snake.{Snake._instance_counter:03d}"
         self.setText(self.title)  # Set the text of the button to its title
         self.ui= ui
-        self.ui.main_viewport_figure_canvas.mpl_connect('motion_notify_event', self.onmove)
+        self.ui.main_viewport_figure_canvas.mpl_connect('motion_notify_event', self.onmove) 
         self.ui.main_viewport_figure_canvas.mpl_connect('button_press_event', self.onpress)
         self.ui.main_viewport_figure_canvas.mpl_connect('button_release_event', self.onrelease)
-        self.ax1= None
-        self.ax2= None
+        self.ax1= None #input image subplot
+        self.ax2= None #output image subplot
         # Attributes
         # The group box that will contain the effect options
         self.snake_groupbox = SnakeGroupBox(self.title)
         self.snake_groupbox.setVisible(False)
+        self.snake_groupbox.iterations_spinbox.editingFinished.connect(self.update_displayed_result)
+        self.snake_groupbox.ALPHA_spinbox.editingFinished.connect(self.update_displayed_result)
+        self.snake_groupbox.BETA_spinbox.editingFinished.connect(self.update_displayed_result)
+        self.snake_groupbox.GAMMA_spinbox.editingFinished.connect(self.update_displayed_result)
         self.grayscale_image = grayimageData  # The grayscale image
         self.original_img= img_data # The original image 
         self.filtered_image= self.get_filtered_image() # The image after applying sobel and gaussian filter
-        # Calculate the default filtered image
-        self.output_image = self.grayscale_image
+        # To determine whether the user already converted the original image to grayscale or not, if converted
+        # display the output image as grayscale image 
+        self.grayscale_flag= grayscale_flag
+        # Set the output image either as RGB or grayscale
+        self.determine_output_image_color_mode()
         self.display_image()
-        # Pass the FreqFilters instance to the FreqFiltersGroupBox class
+        # Pass the Snake instance to the SnakeGroupBox class
         self.snake_groupbox.snake_effect = self
-        # Store the attributes of the effect to be easily stored in the images instances.
-        # self.attributes = self.attributes_dictionary()
         self.contour = np.array([])
         self.drawing = False
         self.window_size = 3
@@ -44,18 +48,41 @@ class Snake(QDoubleClickPushButton):
         self.GAMA = 0.2
         self.frames = []
         self.num_iterations = 14 
-        self.frames= []
-    
+        self.output_contour= np.array([])
+         # Store the attributes of the effect to be easily stored in the images instances.
+        self.attributes = self.attributes_dictionary()
+
+    # Setters
+    def attributes_dictionary(self):
+        """
+        Description:
+            - Returns a dictionary containing the attributes of the effect.
+        """
+        return {
+            "Alpha": self.ALPHA,
+            "Beta": self.BETA,
+            "Gamma": self.GAMA,
+            "Iterations": self.num_iterations,
+            "groupbox": self.snake_groupbox,
+            "final_result": self.display_final_result,
+        }
+
     # Methods
+    
+    def determine_output_image_color_mode(self):
+        """
+            Description:
+                - Determine if the user wants the output image to be grayscale or RGB.
+        """
+        if self.grayscale_flag == 0:
+            self.output_image= self.original_img
+        else:
+            self.output_image= self.grayscale_image
     
     def display_image(self):
             """
             Description:
-                - Displays an image in the main canvas.
-
-            Args:
-                - input_img: The input image to be displayed.
-                - output_img: The output image to be displayed.
+                - Displays the input and output images in the main canvas figure subplots.
             """
             # Clear the previous plot
             self.ui.main_viewport_figure_canvas.figure.clear()
@@ -76,7 +103,7 @@ class Snake(QDoubleClickPushButton):
             self.ax1.axis("off")
             self.ax1.set_title("Input Image", color="white")
 
-            self.ax2.imshow(self.original_img, cmap="gray")
+            self.ax2.imshow(self.output_image, cmap="gray")
             self.ax2.axis("off")
             self.ax2.set_title("Output Image", color="white")
 
@@ -90,30 +117,54 @@ class Snake(QDoubleClickPushButton):
             plt.ion()
             
     def resample_contour(self, contour, threshold_distance):
+        """
+        Description:
+        Resample the contour to get appropriate number of equidistance point.
+
+        Args:
+            -contour: Array of initial contour points.
+            -threshold_distance: Threshold distance for resampling.
+
+        Returns:
+            -resampled_contour: Array containing the resampled points.
+        """
+        # Add the first point of the initial contour to the resampled contour array
         resampled_contour = [contour[0]]  
         current_point = contour[0]
-        
+        #Loop over the contour points 
         for i in range(1, len(contour)):
             next_point = contour[i]
+            # Calculate the distance between the current point and the next point and compare it with the threshold
             distance = np.sqrt(np.sum((next_point - current_point) ** 2))  
             if distance >= threshold_distance:
-                num_segments = distance / threshold_distance 
+                num_segments = distance / threshold_distance
+                # if the distance is greater than twice the threshold, perform linear interpolation to get points
+                # between those two points at distances equal to the threshold distance 
                 if num_segments > 1:
                     for j in range(1, int(num_segments)):
                         t = j / num_segments
                         interpolated_point = current_point + t * (next_point - current_point)
                         resampled_contour.append(interpolated_point)
-                    distance= np.sqrt(np.sum((next_point - resampled_contour[-1]) ** 2))
-                    if distance > 0.6 * 2* threshold_distance :
-                        midpoint = (resampled_contour[-1] + next_point) / 2
-                        resampled_contour.append(midpoint)
-                resampled_contour.append(next_point)
+                distance= np.sqrt(np.sum((next_point - resampled_contour[-1]) ** 2))
+                # if the distance is 60% close to double the threshold 
+                if distance > 0.6 * 2* threshold_distance :
+                    # take new point at the middle between the current point and the next point
+                    midpoint = (resampled_contour[-1] + next_point) / 2
+                    resampled_contour.append(midpoint)
+                    resampled_contour.append(next_point)
+                else:
+                    resampled_contour.append(next_point)
+                #update the current point 
                 current_point = next_point  
-        self.distances= np.sqrt(np.sum(np.diff(resampled_contour, axis=0)**2, axis=1))
+        # Calculate the distance between the first and last point and compare it to the threshold
         distance = np.sqrt(np.sum((resampled_contour[0] - resampled_contour[-1]) ** 2))
         if distance< threshold_distance:
+            #if it is less than the threshold, remove the last point
             resampled_contour.pop()
-        resampled_contour= resampled_contour[::4]
+        # if there is 40 points or more, Drop some points from the final array to reduce its size to be around 20 points
+        if len(resampled_contour) >= 40:
+            drop_step= int(len(resampled_contour)/ 20)
+            resampled_contour= resampled_contour[::drop_step]
         return np.array(resampled_contour)
 
 
@@ -126,6 +177,8 @@ class Snake(QDoubleClickPushButton):
             plt.draw()
 
     def onpress(self, event):
+        self.set_up_subplot(self.ax1, self.original_img,"Input Image" )
+        self.ui.main_viewport_figure_canvas.draw()
         if event.button == 1 and event.inaxes == self.ax1:
             self.drawing = True
             x, y = event.xdata, event.ydata
@@ -138,6 +191,7 @@ class Snake(QDoubleClickPushButton):
             if len(self.contour) > 0:
                 # Resample the collected contour 
                 resampled_contour = self.resample_contour(self.contour, 4)
+                # Draw the final equidistance contour points
                 self.ax1.plot(resampled_contour[:, 0], resampled_contour[:, 1], 'ro')
                 self.contour = np.array(resampled_contour, dtype=int)
                 self.display_output()
@@ -225,28 +279,31 @@ class Snake(QDoubleClickPushButton):
 
 
     def display_output(self):
+        self.output_contour= self.contour.copy()
         for _ in range(self.num_iterations):
-            self.contour = self.update_contour(self.filtered_image, self.contour, self.window_size, self.ALPHA, self.BETA , self.GAMA)
+            self.output_contour = self.update_contour(self.filtered_image, self.output_contour, self.window_size, self.ALPHA, self.BETA , self.GAMA)
 
             # Clear and redraw the plot
-            self.ax2.clear()
-            self.ax2.imshow(self.original_img, cmap='gray')
-            self.ax2.plot(self.contour[:, 0], self.contour[:, 1], 'ro-')
-
-            # # Save the current frame
+            self.set_up_subplot(self.ax2, self.output_image,"Output Image" )
+            self.ax2.plot(self.output_contour[:, 0], self.output_contour[:, 1], 'ro-')
             self.ui.main_viewport_figure_canvas.draw()
+            # Save the current frame
             frame = np.array(self.ui.main_viewport_figure_canvas.renderer.buffer_rgba())
             self.frames.append(frame)
-
         imageio.mimsave('snake_animation.gif', self.frames, fps=10)
-
-        self.ax2.clear()
-        self.ax2.imshow(self.original_img, cmap='gray')
-        self.ax2.plot(self.contour[:, 0], self.contour[:, 1], 'ro')
+        self.set_up_subplot(self.ax2, self.output_image,"Output Image" )
+        self.ax2.plot(self.output_contour[:, 0], self.output_contour[:, 1], 'ro')
         self.ui.main_viewport_figure_canvas.draw()
 
 
     def get_filtered_image(self):
+        """
+        Description:
+            - Apply sobel and guassian filter to the input image as an initial step in the snake algorithm.
+        Returns:
+            - The resultant filtered image.
+
+        """
         filter_effect = Filter("Gaussian", "5", 1, self.grayscale_image)
         filtered_image= filter_effect.output_image
         filtered_image= self.get_edges(filtered_image)
@@ -259,6 +316,21 @@ class Snake(QDoubleClickPushButton):
 
 
     def compute_gradient_using_convolution(self, image, x_kernel, y_kernel):
+        """
+        Description:
+            - Compute edges and gradient directions of the input image using the specified x and y kernels.
+
+        Parameters:
+            - image (numpy.ndarray): The input image.
+            - x_kernel (numpy.ndarray): The kernel for computing the x component of the gradient.
+            - y_kernel (numpy.ndarray): The kernel for computing the y component of the gradient.
+
+        Returns:
+            Tuple[numpy.ndarray, numpy.ndarray]: A tuple containing:
+                - The resultant edges image.
+                - The gradient directions image.
+        """
+        
         x_component = self.convolve_2d(image,x_kernel)
         y_component = self.convolve_2d(image, y_kernel)
         resultant = np.abs(x_component) + abs(y_component)
@@ -267,6 +339,20 @@ class Snake(QDoubleClickPushButton):
         return (resultant, direction)
     
     def convolve_2d(self, image, kernel, mutlipy = True):
+        """
+        Description: 
+            - Perform 2D convolution on the input image with the given kernel.
+
+        Parameters:
+            - image (numpy.ndarray): The input image.
+            - kernel (numpy.ndarray): The convolution kernel.
+            - multiply (bool, optional): Whether to multiply the kernel with the image region. 
+                                    Defaults to True.
+
+        Returns:
+            numpy.ndarray: The convolved image.
+
+        """
         image_height, image_width = image.shape
         kernel_size = kernel.shape[0]
 
@@ -294,21 +380,94 @@ class Snake(QDoubleClickPushButton):
         return  np.clip(output_image,0,255)
     
     def padding_image(self, image, width, height, pad_size):
+        """
+        Descripion:
+            - Pad the input image with zeros from the four direction with the specified padding size.
+
+        Parameters:
+            - image (numpy.ndarray): The input image.
+            - width (int): The desired width of the padded image.
+            - height (int): The desired height of the padded image.
+            - pad_size (int): The size of padding to add around the image.
+
+        Returns:
+            numpy.ndarray: The padded image.
+
+        """
         padded_image = np.zeros((height + 2 * pad_size, width + 2 * pad_size)) 
         padded_image[pad_size:-pad_size, pad_size:-pad_size] = image 
         return padded_image
     
     def sobel_3x3(self,image):
+        """
+        Apply the Sobel 3x3 edge detection filter to the input image.
+
+        Parameters:
+            image (numpy.ndarray): The input image.
+
+        Returns:
+            Tuple[numpy.ndarray, numpy.ndarray]: A tuple containing:
+                - The resultant edges image.
+                - The gradient directions image.
+        """
         dI_dX = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
         dI_dY = np.rot90(dI_dX)
         return self.compute_gradient_using_convolution(image, dI_dX, dI_dY)
     
     def get_edges(self, image):
+        """
+        Apply the Sobel 3x3 edge detection filter to the input image.
+
+        Parameters:
+            image (numpy.ndarray): The input image.
+
+        Returns:
+            - The resultant edged image.
+        """
+        
         edged_image  = self.sobel_3x3(image) 
         if len(edged_image) == 2:
             return edged_image[0]
         else:
             return edged_image 
+
+    def display_final_result(self):
+        """
+            Description:
+                - To easily get back to the final output of the effect after displaying other effects.
+        """
+        self.display_image()
+        if not self.contour.size == 0:
+            self.ax2.plot(self.output_contour[:, 0], self.output_contour[:, 1], 'ro')
+            self.ax1.plot(self.contour[:, 0], self.contour[:, 1], 'ro-')
+    
+    def set_up_subplot(self, subplot, image, title):
+        """
+            Description:
+                - To clear and redraw any of the two subplots without code repetition.
+            Args:
+                - subplot: The subplot the will be updated.
+                - image: The image that will be displayed.
+                - title: The title of the subplot.
+        """
+        subplot.clear()
+        subplot.imshow(image, cmap='gray')
+        subplot.set_title(title, color="white")
+        
+    
+    def update_displayed_result(self):
+        """
+        Description:
+            - Updates the parameters of the effect and the output depending on
+                the associated effect groupbox.
+        """
+        self.ALPHA= self.snake_groupbox.ALPHA_spinbox.value()
+        self.BETA= self.snake_groupbox.BETA_spinbox.value()
+        self.GAMA= self.snake_groupbox.GAMMA_spinbox.value()
+        self.num_iterations= self.snake_groupbox.iterations_spinbox.value()
+        self.frames=[]
+        self.display_output()
+    
 
         
 
