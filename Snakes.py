@@ -7,13 +7,12 @@ import imageio
 
 image_3 = Image("images.jpeg") # insert the image path 
 image_3.convert_to_grayscale()
+
 processor = ImageProcessor()
 magnitude = processor.get_edges(image_3, "sobel_3x3", filter_flag=False) # retruns data not image object 
-
 image_4 = Image(image_data = magnitude)
-processor.apply_filter(image_4, "gaussian", sigma = 20)
-
-
+processor.apply_filter(image_4, "gaussian", filter_size= 20, sigma = 10 ) 
+image_4.display()
 
 
 def resample_contour(contour, num_points):
@@ -86,8 +85,8 @@ cid3 = fig.canvas.mpl_connect('button_release_event', onrelease)
 input("Press Enter when done...")
 
 print(len(contour))
-print(contour)
-print(image_3.original_img.shape)
+
+
 
 
 def compute_internal_energy(contour, control_idx, neighbour_pos):
@@ -122,7 +121,7 @@ def get_neighbours_with_indices(image_gradient, loc, window_size):
 
     for x in range(neighbour_indices.shape[0]):
         for y in range(neighbour_indices.shape[1]):
-            neighbour_indices[x, y] = (i_start + x, j_start + y)
+            neighbour_indices[x, y] = (i_start + x, j_start + y) 
 
     return neighbour_grad, neighbour_indices
 
@@ -131,39 +130,65 @@ def update_contour(image_gradient ,contour, window_size ,alpha = 1, beta = 0.5 ,
 
     for control_idx, control_point in enumerate(contour):
         neighbour_grad, neighbour_indices =  get_neighbours_with_indices(image_gradient, control_point, window_size)
-        external_energy_neighbours = neighbour_grad * gama * -1 
+
+        external_energy_neighbours = neighbour_grad * gama * -1  
+
         internal_energy_neighbour = np.zeros_like(neighbour_grad)
+
         for row in range(neighbour_indices.shape[0]):
             for col in range(neighbour_indices.shape[1]):
-                E_elastic, E_smooth = compute_internal_energy(contour,control_idx,neighbour_indices[row,col])
+                E_elastic, E_smooth = compute_internal_energy(contour,control_idx, neighbour_indices[row,col])
                 internal_energy_neighbour[row, col] = alpha * E_elastic + beta * E_smooth
 
 
-        overall_energy_neighbours =   external_energy_neighbours + internal_energy_neighbour 
-        min_energy = np.argmin(overall_energy_neighbours)
+        overall_energy_neighbours = external_energy_neighbours + internal_energy_neighbour 
 
-        i, j = np.unravel_index(min_energy, overall_energy_neighbours.shape)
+# ------------------------------------ loose -------------------------------
+        # min_energy = np.argmin(overall_energy_neighbours) 
 
-        i_actual, j_actual = neighbour_indices[i,j]
+        # i, j = np.unravel_index(min_energy, overall_energy_neighbours.shape)
 
-        contour[control_idx] = [i_actual, j_actual]
+        # i_actual, j_actual = neighbour_indices[i,j]
+
+        # contour[control_idx] = [i_actual, j_actual]
+        
+#------------------------------------- restricted ---------------------------
+        # high time complexity due to sorting 
+
+        sorted_indices = np.argsort(overall_energy_neighbours, axis=None)
+
+        for min_energy_index in sorted_indices: 
+
+            i, j = np.unravel_index(min_energy_index, overall_energy_neighbours.shape)
+
+            i_actual, j_actual = neighbour_indices[i, j]
+
+            # check if the candidate control point is already existent in coutour 
+            if not any(np.all(contour == [i_actual, j_actual], axis=1)): 
+                contour[control_idx] = [i_actual, j_actual]
+                break 
+
+            # else, keep iterating until getting the lowest energy position. 
+
     return  contour 
 
 
         
+    
 window_size = 3
 
-ALPHA = 0.5
+ALPHA = 1
 BETA = 1
-GAMA = 0.2
+GAMA =  0.5 
+num_iterations = 10
+
 
 frames = []
-num_iterations = 20 
 
 for _ in range(num_iterations):
     print("update")
 
-    contour = update_contour(image_4.original_img, contour, window_size, alpha=ALPHA, beta=BETA ,gama = GAMA)
+    contour = update_contour(image_4.manipulated_img, contour, window_size, alpha=ALPHA, beta=BETA ,gama = GAMA)
 
     # Clear and redraw the plot
     ax.clear()

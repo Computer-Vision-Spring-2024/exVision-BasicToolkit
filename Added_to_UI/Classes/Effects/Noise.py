@@ -63,6 +63,7 @@ class Noise(QDoubleClickPushButton):
             "val02": self.val02,
             "output": self.output_image,
             "groupbox": self.noise_groupbox,
+            "final_result": self.update_attributes,
         }
 
     # Methods

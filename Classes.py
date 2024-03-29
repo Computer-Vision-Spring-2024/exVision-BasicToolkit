@@ -406,7 +406,7 @@ class Image:
         plt.figure(figsize=(5, 5))
         plt.imshow(self.manipulated_img, cmap="gray" if not self.colored else None)
         plt.axis('off')
-        # plt.show()
+        plt.show()
 
     def reset_image(self):
         self.manipulated_img = np.copy(self.original_img)

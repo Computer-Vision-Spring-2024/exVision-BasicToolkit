@@ -53,6 +53,7 @@ class Thresholding(QDoubleClickPushButton):
             "val01": self.val01,
             "thresholded_image": self.thresholded_image,
             "groupbox": self.thresholding_groupbox,
+            "final_result": self.update_attributes,
         }
 
     # Methods

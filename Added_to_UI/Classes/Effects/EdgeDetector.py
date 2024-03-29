@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from Classes.EffectsWidgets.EdgeDetectorGroupBox import EdgeDetectorGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-
+from Classes.Effects.Filter import Filter
 
 class EdgeDetector(QDoubleClickPushButton):
     _instance_counter = 0
@@ -24,11 +24,13 @@ class EdgeDetector(QDoubleClickPushButton):
             "prewitt": self.prewitt,
             "laplacian": self.laplacian,
             "canny": self.canny,
+            
         }
         self.current_working_image = None  # this represents the current image on which we will perform all operations (MUST BE GRAYSCALE)
         self.current_detector_type = "sobel_3x3"  # default detector 
         self.edged_image = None  # output image 
-
+        self.low_threshold_ratio=0.05 
+        self.high_threshold_ratio= 0.2
         self.edge_widget = EdgeDetectorGroupBox(self.title)
         # Pass the NoiseGroupBox instance to the Noise class
         self.edge_widget.edge_effect = self
@@ -36,7 +38,12 @@ class EdgeDetector(QDoubleClickPushButton):
         self.edge_widget.edge_widget_combo_box.currentTextChanged.connect(
             self.update_detector_type
         )
-
+        self.edge_widget.low_threshold_spinbox.editingFinished.connect(
+            self.update_detector_type
+        )
+        self.edge_widget.high_threshold_spinbox.editingFinished.connect(
+            self.update_detector_type
+        )
         # Store the attributes of the effect to be easily stored in the images instances.
         self.attributes = self.attributes_dictionary()
 
@@ -50,6 +57,7 @@ class EdgeDetector(QDoubleClickPushButton):
             # "edge detector type": self.current_edge_detector,
             "edge detector type": self.current_detector_type,
             "groupbox": self.edge_widget,
+            "final_result": self.update_detector_type,
         }
 
     def update_detector_type(self):
@@ -57,6 +65,8 @@ class EdgeDetector(QDoubleClickPushButton):
         self.current_detector_type = (
             self.edge_widget.edge_widget_combo_box.currentText()
         )
+        self.low_threshold_ratio= self.edge_widget.low_threshold_spinbox.value()
+        self.high_threshold_ratio= self.edge_widget.high_threshold_spinbox.value()
         self.apply_detector()
         self.attributes_updated.emit(self.edged_image) # emitting a signal of new edged image catptured, so that it gets displayed instead of the current one.
 
@@ -68,24 +78,11 @@ class EdgeDetector(QDoubleClickPushButton):
         - image: numpy.ndarray
             The input image.
         """
-        self.current_working_image = image # Always grayscale  
+        filter_effect = Filter("Gaussian", "5", 1, image)
+        filtered_image= filter_effect.output_image
+        self.current_working_image = filtered_image 
     # ----------------------------------------------------------------------------- Methods ------------------------------------------------------------------------
-    def to_grayscale(self, image):
-        """
-        Descripion:
-            - Convert an image to grayscale by averaging the red, green, and blue channels for each pixel.
-
-        Parameters:
-        - image: numpy.ndarray
-            The input image.
-
-        Returns:
-        - numpy.ndarray
-            The grayscale image.
-        """
-        grayscale_image = np.dot(image[..., :3], [0.2989, 0.5870, 0.1140])
-        return grayscale_image
-
+   
     def apply_detector(self):
         """   
         Descripion:
@@ -353,16 +350,12 @@ class EdgeDetector(QDoubleClickPushButton):
 
         return suppressed_image
 
-    def threshold(self, img, lowThresholdRatio=0.05, highThresholdRatio=0.2):
+    def threshold(self, img):
         """
         Apply thresholding to the input image to identify potential edge pixels.
 
         Parameters:
             img (numpy.ndarray): The input image.
-            lowThresholdRatio (float, optional): The ratio of the high threshold to use as the low threshold. 
-                                                Defaults to 0.05.
-            highThresholdRatio (float, optional): The ratio of the maximum intensity to use as the high threshold. 
-                                                Defaults to 0.2.
 
         Returns:
             Tuple[numpy.ndarray, int, int]: A tuple containing:
@@ -370,8 +363,8 @@ class EdgeDetector(QDoubleClickPushButton):
                 - The intensity value for weak edge pixels.
                 - The intensity value for strong edge pixels.
         """
-        highThreshold = img.max() * highThresholdRatio
-        lowThreshold = highThreshold * lowThresholdRatio 
+        highThreshold = img.max() * self.high_threshold_ratio
+        lowThreshold = highThreshold * self.low_threshold_ratio
 
         image_height, image_width = img.shape
         res = np.zeros((image_height, image_width), dtype=np.int32)

@@ -60,6 +60,7 @@ class Filter(QDoubleClickPushButton):
             "kernel_size": self.kernel_size,
             "output": self.output_image,
             "groupbox": self.filter_groupbox,
+            "final_result": self.update_attributes,
         }
 
     # Methods
