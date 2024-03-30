@@ -1111,7 +1111,14 @@ class Backend:
         blurred = cv2.GaussianBlur(grayscale_image, (5, 5), 0)
 
         # Canny edge detection
-        edged_image = cv2.Canny(blurred, 50, 180)
+        # make an instance of our canny, and change the parameters as you like
+        # you can try to add the groupbox of the edge detector also to the ui so
+        # you can change the values of
+        # then pass the output of out canny to the hough transform
+        # then we should tweak the values in the ui of the hough
+        # edged_image = EdgeDetector().canny(grayscale_image)
+        # # edged_image = cv2.Canny(grayscale_image, 634, 854, 7)
+        # # edged_image = cv2.Canny(blurred, 50, 180)
 
         hough_effect = HoughTransform(
             "Line", self.current_image_data, grayscale_image, edged_image

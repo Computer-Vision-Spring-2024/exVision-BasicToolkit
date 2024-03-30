@@ -3,9 +3,8 @@ from collections import defaultdict
 
 import cv2
 import numpy as np
-from PyQt5.QtCore import QObject, pyqtSignal
-
 from Classes.EffectsWidgets.HoughTransformGroupBox import HoughTransformGroupBox
+from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class HoughTransform(QObject):
@@ -41,6 +40,15 @@ class HoughTransform(QObject):
             self.calculate_hough()
         )  # The image after applying the effect
 
+        # Default Line Detection Parameters
+        self.threshold = None
+        # Default Circle Detection Parameters
+        self.min_radius = None
+        self.max_radius = None
+        self.accumulator_threshold = None
+        self.min_dist = None
+        # Default Ellipse Detection Parameters
+
         # The group box that will contain the effect options
         self.hough_groupbox = HoughTransformGroupBox(self.title)
         self.hough_groupbox.setVisible(False)
@@ -51,6 +59,24 @@ class HoughTransform(QObject):
         self.hough_groupbox.hough_type_combo_box.currentIndexChanged.connect(
             self.update_attributes
         )
+        # update the widgets in FilterGroupBox
+        self.hough_groupbox.hough_type_combo_box.currentIndexChanged.connect(
+            self.hough_groupbox.update_hough_options
+        )
+        # update the detection parameters for each type
+        self.hough_groupbox.line_threshold_spinbox.valueChanged.connect(
+            self.update_attributes
+        )
+        self.hough_groupbox.min_radius_slider.valueChanged.connect(
+            self.update_attributes
+        )
+        self.hough_groupbox.max_radius_slider.valueChanged.connect(
+            self.update_attributes
+        )
+        self.hough_groupbox.accumulator_threshold_slider.valueChanged.connect(
+            self.update_attributes
+        )
+        self.hough_groupbox.min_dist_slider.valueChanged.connect(self.update_attributes)
 
         # Store the attributes of the effect to be easily stored in the images instances.
         self.attributes = self.attributes_dictionary()
@@ -76,6 +102,13 @@ class HoughTransform(QObject):
                 the associated effect groupbox.
         """
         self.type = self.hough_groupbox.hough_type_combo_box.currentText()
+        self.threshold = self.hough_groupbox.line_threshold_spinbox.value()
+        self.min_radius = self.hough_groupbox.min_radius_spinbox.value()
+        self.max_radius = self.hough_groupbox.max_radius_spinbox.value()
+        self.accumulator_threshold = (
+            self.hough_groupbox.accumulator_threshold_spinbox.value()
+        )
+        self.min_dist = self.hough_groupbox.min_dist_spinbox.value()
         self.output_image = self.calculate_hough()
         self.attibutes = self.attributes_dictionary()
         self.attributes_updated.emit(self.output_image)
@@ -85,27 +118,23 @@ class HoughTransform(QObject):
             # Default Line Detection Parameters
             rho = 9
             theta = 0.261
-            threshold = 101
-            lines = self.hough_line(threshold, -np.pi / 2, np.pi / 2, theta, rho)
+            self.threshold = 101
+            lines = self.hough_line(-np.pi / 2, np.pi / 2, theta, rho)
             lines_img, _ = self.draw_lines(self.original_image, lines, cv2_setup=False)
             return lines_img
 
         elif self.type == "Circle":
-            min_radius = 10
-            max_radius = 80
-            accumulator_threshold = 52
-            min_dist = 30  # Adjust this value as needed
-
-            return self.hough_circle(
-                min_radius, max_radius, accumulator_threshold, min_dist
-            )
+            self.min_radius = 10
+            self.max_radius = 80
+            self.accumulator_threshold = 52
+            self.min_dist = 30
+            return self.hough_circle()
 
         elif self.type == "Ellipse":
             return self.hough_ellipse()
 
     def hough_line(
         self,
-        threshold: float,
         min_theta: float,
         max_theta: float,
         theta: float,
@@ -116,7 +145,6 @@ class HoughTransform(QObject):
             - Detects the lines in the image using the Hough Transform algorithm.
 
         Args:
-            - threshold: The minimum number of votes a line should have to be considered as a real line.
             - min_theta: The minimum angle of the lines to be detected.
             - max_theta: The maximum angle of the lines to be detected.
             - theta: The step size of the angles to be considered.
@@ -156,7 +184,7 @@ class HoughTransform(QObject):
                 accumulator[rho_pos, t] += 1
 
         # Take the polar coordinates most matched
-        final_rho_index, final_theta_index = np.where(accumulator > threshold)
+        final_rho_index, final_theta_index = np.where(accumulator > self.threshold)
         final_rho = rho_values[final_rho_index]
         final_theta = theta_angles[final_theta_index]
 
@@ -165,7 +193,7 @@ class HoughTransform(QObject):
         return polar_coordinates
 
     # dp to control accumulator size, min_dist to control accepted circles according to the distance bet. their centers
-    def hough_circle(self, min_radius, max_radius, accumulator_threshold, min_dist):
+    def hough_circle(self):
         """
         Description:
             - Detects the circles in the image using the Hough Transform algorithm.
@@ -183,7 +211,7 @@ class HoughTransform(QObject):
         height, width = self.edged_image.shape[:2]
 
         # Define radius range for iteration
-        radii = np.arange(min_radius, max_radius + 1)
+        radii = np.arange(self.min_radius, self.max_radius + 1)
 
         circle_candidates = []
 
@@ -217,10 +245,9 @@ class HoughTransform(QObject):
         for candidate_circle, votes in sorted(accumulator.items(), key=lambda i: -i[1]):
             x, y, r = candidate_circle
             current_vote = votes
-            if current_vote >= accumulator_threshold:
+            if current_vote >= self.accumulator_threshold:
                 # Shortlist the circle for final result
                 out_circles.append((x, y, r, current_vote))
-                print(x, y, r, current_vote)
 
         filtered_circles = []
         for x, y, r, v in out_circles:
@@ -228,9 +255,9 @@ class HoughTransform(QObject):
             # all((x - xc) ** 2 + (y - yc) ** 2 > rc ** 2 for xc, yc, rc, v in filtered_circles)
             # Remove nearby duplicate circles based on min_dist
             if all(
-                abs(x - xc) > min_dist
-                or abs(y - yc) > min_dist
-                or abs(r - rc) > min_dist
+                abs(x - xc) > self.min_dist
+                or abs(y - yc) > self.min_dist
+                or abs(r - rc) > self.min_dist
                 for xc, yc, rc, v in filtered_circles
             ):
                 filtered_circles.append((x, y, r, v))
