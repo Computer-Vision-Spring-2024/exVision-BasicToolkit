@@ -719,10 +719,10 @@ class Backend:
 
         filter_effect = Filter("Mean", "3", 0, self.grayscale_image)
 
-        # Noise Effect Signal
+        # Filter Effect Signal
         filter_effect.attributes_updated.connect(self.update_output_image)
 
-        # Get the output image after applying the noise
+        # Get the output image after applying the Filter
         self.output_image = filter_effect.output_image
 
         # UI Changes and Setters
@@ -1091,8 +1091,8 @@ class Backend:
     def hough(self):
         """
         Description:
-            - Apply a boundary detection "Hough Transform" algorithm on the current image.
-              The available options till now: Line, Circle, and Ellipse
+            -   Apply a boundary detection "Hough Transform" algorithm on the current image.
+                The available options till now: Line, Circle, and Ellipse
         """
         if self.current_image_data is None:
             self.show_message(
@@ -1100,42 +1100,56 @@ class Backend:
             )
             return
 
-        grayscale_image = self.convert_to_grayscale(
-            0, self.grayscale_image, self.current_image_data
-        )
+        if self._check_conversion() == 0:
+            return
 
         # Convert the image to 8-bit unsigned integer
-        grayscale_image = np.uint8(grayscale_image)
+        # self.grayscale_image = np.uint8(self.grayscale_image)
 
-        # Apply Gaussian blur to reduce noise
-        blurred = cv2.GaussianBlur(grayscale_image, (5, 5), 0)
+        # Initialize a group box that will contain the parameters of filter, edge detector, and hough
+        hough_collection_groupbox = QtWidgets.QGroupBox("HT Editing Pack")
+        hough_collection_groupbox_vbox = QtWidgets.QVBoxLayout()
+        hough_collection_groupbox.setLayout(
+            hough_collection_groupbox_vbox
+        )  # Set the layout
+        self.ui.scroll_area_VLayout.insertWidget(0, hough_collection_groupbox)
 
-        # Canny edge detection
-        # make an instance of our canny, and change the parameters as you like
-        # you can try to add the groupbox of the edge detector also to the ui so
-        # you can change the values of
-        # then pass the output of out canny to the hough transform
-        # then we should tweak the values in the ui of the hough
-        # edged_image = EdgeDetector().canny(grayscale_image)
-        # # edged_image = cv2.Canny(grayscale_image, 634, 854, 7)
-        # # edged_image = cv2.Canny(blurred, 50, 180)
+        # Filter the image to reduce the noise
+        filter_effect = Filter("Mean", "3", 0, self.grayscale_image)
+        filtered_image = filter_effect.output_image
+        hough_collection_groupbox_vbox.addWidget(filter_effect.filter_groupbox)
 
-        hough_effect = HoughTransform(
-            "Line", self.current_image_data, grayscale_image, edged_image
+        # Detect edges in the filtered image using Canny
+        edge_detector = EdgeDetector()
+        edged_image = edge_detector.canny(filtered_image)
+        hough_collection_groupbox_vbox.addWidget(edge_detector.edge_widget)
+
+        # Connect the "Apply" Buttons to functions that takes the new images and apply the hough transform
+        edge_detector.attributes_updated.connect(
+            self.update_edge_detection_for_hough_transform
         )
 
+        # Apply Hough Transform
+        self.apply_hough_transform(edged_image)
+
+    def update_edge_detection_for_hough_transform(self, new_edged_image):
+        self.apply_hough_transform(new_edged_image)
+
+    def apply_hough_transform(self, edged_image):
+        # Apply Hough Transform
+        hough_effect = HoughTransform(
+            "Line", self.current_image_data, self.grayscale_image, edged_image
+        )
         # Hough Effect Signal
         hough_effect.attributes_updated.connect(self.update_output_image)
-
         # Get the output image after applying the hough tranform
         self.output_image = hough_effect.output_image
-
         # UI Changes and Setters
         self.ui.scroll_area_VLayout.insertWidget(0, hough_effect.hough_groupbox)
+
         self.current_image.add_applied_effect(
             hough_effect.title, hough_effect.attributes
         )
-
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
         self.update_table()

@@ -2,9 +2,14 @@ import typing as tp
 from collections import defaultdict
 
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 from Classes.EffectsWidgets.HoughTransformGroupBox import HoughTransformGroupBox
 from PyQt5.QtCore import QObject, pyqtSignal
+from skimage import color, data, img_as_ubyte
+from skimage.draw import ellipse_perimeter
+from skimage.feature import canny
+from skimage.transform import hough_ellipse
 
 
 class HoughTransform(QObject):
@@ -51,7 +56,7 @@ class HoughTransform(QObject):
 
         # The group box that will contain the effect options
         self.hough_groupbox = HoughTransformGroupBox(self.title)
-        self.hough_groupbox.setVisible(False)
+        self.hough_groupbox.setVisible(True)
         # Pass the HoughTransform instance to the HoughTransformGroupBox class
         self.hough_groupbox.hough_transform = self
 
@@ -272,7 +277,58 @@ class HoughTransform(QObject):
         return superimposed_circles_image
 
     def hough_ellipse(self):
-        pass
+        result = hough_ellipse(
+            self.edged_image, accuracy=20, threshold=250, min_size=100, max_size=120
+        )
+        result.sort(order="accumulator")
+
+        # Estimated parameters for the ellipse
+        best_estimated_parameters = list(result[-1])
+        y_center, x_center, minor_axis_radius, major_axis_radius = (
+            int(round(x)) for x in best_estimated_parameters[1:5]
+        )
+        orientation = best_estimated_parameters[5]
+
+        # Create a copy of the original image
+        result_image = np.copy(self.original_image)
+
+        # Draw the ellipse on the original image
+        y_indices_of_ellipses, x_indices_of_ellipses = ellipse_perimeter(
+            y_center, x_center, minor_axis_radius, major_axis_radius, orientation
+        )
+        result_image[y_indices_of_ellipses, x_indices_of_ellipses] = (0, 0, 255)
+
+        return result_image
+
+    def hough_ellipse(self):
+        result = hough_ellipse(
+            self.edged_image, accuracy=20, threshold=250, min_size=100, max_size=120
+        )
+        result.sort(order="accumulator")
+
+        # Estimated parameters for the ellipse
+        best_estimated_parameters = list(result[-1])
+        y_center, x_center, minor_axis_radius, major_axis_radius = (
+            int(round(x)) for x in best_estimated_parameters[1:5]
+        )
+        orientation = best_estimated_parameters[5]
+
+        # Create a copy of the original image
+        result_image = np.copy(self.original_image)
+
+        # Draw the ellipse on the copied image
+        y_indices_of_ellipses, x_indices_of_ellipses = ellipse_perimeter(
+            y_center, x_center, minor_axis_radius, major_axis_radius, orientation
+        )
+        result_image[y_indices_of_ellipses, x_indices_of_ellipses] = (0, 0, 255)
+
+        # Convert the edged image to RGB for visualization
+        edged_rgb = color.gray2rgb(img_as_ubyte(self.edged_image))
+
+        # Draw the edge (white) and the resulting ellipse (red)
+        edged_rgb[y_indices_of_ellipses, x_indices_of_ellipses] = (250, 0, 0)
+
+        return result_image, edged_rgb
 
     # Line Transform Helper Functions
     def draw_lines(

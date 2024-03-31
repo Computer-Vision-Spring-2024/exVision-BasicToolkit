@@ -29,10 +29,12 @@ class HoughTransformGroupBox(QGroupBox):
         self.hough_type_label = QLabel("HT Type")
         self.hough_type_combo_box = QComboBox()
         self.hough_type_combo_box.addItems(["Line", "Circle", "Ellipse"])
+        self.hough_type_combo_box.currentIndexChanged.connect(self.update_hough_options)
         self.hough_type_hbox.addWidget(self.hough_type_label)
         self.hough_type_hbox.addWidget(self.hough_type_combo_box)
 
-        # Attributes for the Circle Detection
+        # Attributes for the Line Detection
+        self.line_attributes_groupbox = QGroupBox("Line Attributes")
         self.line_attributes_vbox = QVBoxLayout()
         self.line_threshold_hbox = QHBoxLayout()
         self.line_threshold_label = QLabel("Threshold")
@@ -53,8 +55,10 @@ class HoughTransformGroupBox(QGroupBox):
 
         self.line_attributes_vbox.addWidget(self.line_threshold_label)
         self.line_attributes_vbox.addLayout(self.line_threshold_hbox)
+        self.line_attributes_groupbox.setLayout(self.line_attributes_vbox)
 
         # Attributes for the Circle Detection
+        self.circle_attributes_groupbox = QGroupBox("Circle Attributes")
         self.circle_attributes_vbox = QVBoxLayout()
         self.min_radius_hbox = QHBoxLayout()
         self.min_radius_label = QLabel("Min Radius")
@@ -121,8 +125,27 @@ class HoughTransformGroupBox(QGroupBox):
         self.circle_attributes_vbox.addWidget(self.min_dist_label)
         self.circle_attributes_vbox.addLayout(self.min_dist_hbox)
 
+        self.circle_attributes_groupbox.setLayout(self.circle_attributes_vbox)
+
+        # Attributes for the Ellipse Detection
+        self.ellipse_attributes_groupbox = QGroupBox("Ellipse Attributes")
+
+        self.ellipse_attributes_hbox = QHBoxLayout()
+        self.ellipse_detector_type_label = QLabel("Detector Type")
+        self.ellipse_detector_type_combobox = QComboBox()
+        self.ellipse_detector_type_combobox.addItems(
+            ["Scikit-image", "OpenCV", "From Scratch"]
+        )
+        self.ellipse_attributes_hbox.addWidget(self.ellipse_detector_type_label)
+        self.ellipse_attributes_hbox.addWidget(self.ellipse_detector_type_combobox)
+
+        self.ellipse_attributes_groupbox.setLayout(self.ellipse_attributes_hbox)
+
         # Add the layouts to the main layout
         self.main_layout.addLayout(self.hough_type_hbox)
+        self.main_layout.addWidget(self.line_attributes_groupbox)
+        self.main_layout.addWidget(self.circle_attributes_groupbox)
+        self.main_layout.addWidget(self.ellipse_attributes_groupbox)
         self.update_hough_options(0)  # Set default options for Line Detection
 
         # Set the main layout of the group box
@@ -130,8 +153,14 @@ class HoughTransformGroupBox(QGroupBox):
 
     def update_hough_options(self, index):
         if index == 0:  # Line
-            self.main_layout.addLayout(self.line_attributes_vbox)
+            self.line_attributes_groupbox.show()
+            self.circle_attributes_groupbox.hide()
+            self.ellipse_attributes_groupbox.hide()
         elif index == 1:  # Circle
-            self.main_layout.addLayout(self.circle_attributes_vbox)
+            self.line_attributes_groupbox.hide()
+            self.circle_attributes_groupbox.show()
+            self.ellipse_attributes_groupbox.hide()
         elif index == 2:  # Ellipse
-            pass
+            self.line_attributes_groupbox.hide()
+            self.circle_attributes_groupbox.hide()
+            self.ellipse_attributes_groupbox.show()

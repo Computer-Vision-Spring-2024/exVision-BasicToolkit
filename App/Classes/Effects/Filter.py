@@ -1,8 +1,7 @@
 import numpy as np
-from PyQt5.QtCore import pyqtSignal
-
 from Classes.EffectsWidgets.FilterGroupBox import FilterGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from PyQt5.QtCore import pyqtSignal
 
 
 class Filter(QDoubleClickPushButton):
@@ -28,7 +27,7 @@ class Filter(QDoubleClickPushButton):
         self.output_image = self.calculate_filter()
 
         self.filter_groupbox = FilterGroupBox(self.title)
-        self.filter_groupbox.setVisible(False)
+        self.filter_groupbox.setVisible(True)
 
         # Pass the Noise instance to the NoiseGroupBox class
         self.filter_groupbox.filter_effect = self
@@ -86,7 +85,6 @@ class Filter(QDoubleClickPushButton):
             return self.gaussian_filter()
         else:
             raise ValueError("Unexpected filter type: " + self.type)
-
 
     def _pad_image(self):
         """

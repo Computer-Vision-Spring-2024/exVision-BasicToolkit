@@ -6,7 +6,7 @@ class EdgeDetectorGroupBox(QGroupBox):
         super().__init__(title)
         self.title = title
         self.edge_effect = None
-        main_layout = QVBoxLayout()
+        self.main_layout = QVBoxLayout()
         self.label = QLabel("Edge Detector")
 
         self.edge_widget_combo_box = QComboBox()
@@ -41,7 +41,7 @@ class EdgeDetectorGroupBox(QGroupBox):
         highthreshold_HLayout.addWidget(self.high_threshold_spinbox)
 
         
-        main_layout.addLayout(hbox)
-        main_layout.addLayout(lowthreshold_HLayout)
-        main_layout.addLayout(highthreshold_HLayout)
-        self.setLayout(main_layout)
+        self.main_layout.addLayout(hbox)
+        self.main_layout.addLayout(lowthreshold_HLayout)
+        self.main_layout.addLayout(highthreshold_HLayout)
+        self.setLayout(self.main_layout)

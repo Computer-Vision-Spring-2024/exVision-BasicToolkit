@@ -18,7 +18,7 @@ class FilterGroupBox(QGroupBox):
         self.initUI()
 
     def initUI(self):
-        main_layout = QVBoxLayout()
+        self.main_layout = QVBoxLayout()
 
         # Noise Type
         filter_type_layout = QHBoxLayout()
@@ -45,11 +45,11 @@ class FilterGroupBox(QGroupBox):
         self.sigma_layout.addWidget(self.sigma_label)
         self.sigma_layout.addWidget(self.sigma_spinbox)
 
-        main_layout.addLayout(filter_type_layout)
-        main_layout.addLayout(kernel_size_layout)
-        main_layout.addLayout(self.sigma_layout)  # Add sigma layout to main layout
+        self.main_layout.addLayout(filter_type_layout)
+        self.main_layout.addLayout(kernel_size_layout)
+        self.main_layout.addLayout(self.sigma_layout)  # Add sigma layout to main layout
 
-        self.setLayout(main_layout)
+        self.setLayout(self.main_layout)
 
         self.update_filter_options(0)  # Set default options for Uniform noise
 
