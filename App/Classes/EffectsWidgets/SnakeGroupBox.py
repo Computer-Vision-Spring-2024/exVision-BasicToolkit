@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import (
     QLabel,
     QSpinBox,
     QVBoxLayout,
+    QLineEdit,
+    QPushButton,
 )
 
 
@@ -53,9 +55,49 @@ class SnakeGroupBox(QGroupBox):
         self.iterations_HLayout = QHBoxLayout()
         self.iterations_HLayout.addWidget(self.iterations_label)
         self.iterations_HLayout.addWidget(self.iterations_spinbox)
+        
+        initial_area_layout = QHBoxLayout()
+        area1_label = QLabel("Initial Area:")
+        self.area1_line_edit = QLineEdit()
+        self.area1_line_edit.setReadOnly(True)
+        initial_area_layout.addWidget(area1_label)
+        initial_area_layout.addWidget(self.area1_line_edit)
+        
+        initial_perimeter_layout = QHBoxLayout()
+        perimeter1_label = QLabel("Initial perimeter:")
+        self.perimeter1_line_edit = QLineEdit()
+        self.perimeter1_line_edit.setReadOnly(True)
+        initial_perimeter_layout.addWidget(perimeter1_label)
+        initial_perimeter_layout.addWidget(self.perimeter1_line_edit)
+        
+        final_area_layout = QHBoxLayout()
+        area2_label = QLabel("Final Area:")
+        self.area2_line_edit = QLineEdit()
+        self.area2_line_edit.setReadOnly(True)
+        final_area_layout.addWidget(area2_label)
+        final_area_layout.addWidget(self.area2_line_edit)
+        
+        final_perimeter_layout = QHBoxLayout()
+        perimeter2_label = QLabel("Final Perimeter:")
+        self.perimeter2_line_edit = QLineEdit()
+        self.perimeter2_line_edit.setReadOnly(True)
+        final_perimeter_layout.addWidget(perimeter2_label)
+        final_perimeter_layout.addWidget(self.perimeter2_line_edit)
+        
+        self.export_button = QPushButton("Export Chain Code")
+        self.export_label= QLabel("")
+        self.export_label.setStyleSheet("color: red;")
+        
+        
         main_layout.addLayout(self.ALPHA_HLayout)
         main_layout.addLayout(self.BETA_HLayout)
         main_layout.addLayout(self.GAMMA_HLayout)
         main_layout.addLayout(self.iterations_HLayout)
+        main_layout.addLayout(initial_area_layout)
+        main_layout.addLayout(initial_perimeter_layout)
+        main_layout.addLayout(final_area_layout)
+        main_layout.addLayout(final_perimeter_layout)
+        main_layout.addWidget(self.export_button)
+        main_layout.addWidget(self.export_label)
 
         self.setLayout(main_layout)

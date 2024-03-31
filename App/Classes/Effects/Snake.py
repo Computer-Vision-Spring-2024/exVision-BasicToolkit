@@ -2,7 +2,7 @@ import imageio
 import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtCore import pyqtSignal
-
+from PyQt5.QtWidgets import QFileDialog
 from Classes.Effects.Filter import Filter
 from Classes.EffectsWidgets.SnakeGroupBox import SnakeGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
@@ -70,8 +70,22 @@ class Snake(QDoubleClickPushButton):
         self.frames = []
         self.num_iterations = 14
         self.output_contour = np.array([])
+        self.chain_code= None
         # Store the attributes of the effect to be easily stored in the images instances.
         self.attributes = self.attributes_dictionary()
+        # we have used this lookup because the origin in the image space is the upper left corner.
+        self.code_lookup_image_space = {
+            0 : list(range(339,361)) + list(range(0,23,1)), 
+            7 : range(23,68), 
+            7 : range(68,113),  
+            5 : range(113,158), 
+            4 : range(158,203), 
+            3 : range(203, 248), 
+            2 : range(248, 293), 
+            1 : range(293,338)
+        }
+        self.snake_groupbox.export_button.clicked.connect(self.export_chain_code)
+
 
     # Setters
     def attributes_dictionary(self):
@@ -213,8 +227,14 @@ class Snake(QDoubleClickPushButton):
                 # Resample the collected contour
                 resampled_contour = self.resample_contour(self.contour, 4)
                 # Draw the final equidistance contour points
-                self.ax1.plot(resampled_contour[:, 0], resampled_contour[:, 1], "ro")
+                self.ax1.plot(resampled_contour[:, 0], resampled_contour[:, 1], 'ro')
+                # Connect the first point with the last point at which the mouse is released
+                end_points_x = [resampled_contour[0, 0], event.xdata] 
+                end_points_y = [resampled_contour[0, 1], event.ydata] 
+                self.ax1.plot(end_points_x,end_points_y, 'r-')
                 self.contour = np.array(resampled_contour, dtype=int)
+                self.snake_groupbox.area1_line_edit.setText(self.compute_area(resampled_contour))
+                self.snake_groupbox.perimeter1_line_edit.setText(self.compute_perimeter(resampled_contour))
                 self.display_output()
 
     def compute_internal_energy(self, contour, control_idx, neighbour_pos):
@@ -327,15 +347,17 @@ class Snake(QDoubleClickPushButton):
 
             # Clear and redraw the plot
             self.set_up_subplot(self.ax2, self.output_image, "Output Image")
-            self.ax2.plot(self.output_contour[:, 0], self.output_contour[:, 1], "ro-")
-            self.ui.main_viewport_figure_canvas.draw()
+            self.draw_contour(self.ax2, self.output_contour)
             # Save the current frame
             frame = np.array(self.ui.main_viewport_figure_canvas.renderer.buffer_rgba())
             self.frames.append(frame)
         imageio.mimsave("snake_animation.gif", self.frames, fps=10)
         self.set_up_subplot(self.ax2, self.output_image, "Output Image")
-        self.ax2.plot(self.output_contour[:, 0], self.output_contour[:, 1], "ro")
-        self.ui.main_viewport_figure_canvas.draw()
+        self.draw_contour(self.ax2, self.output_contour)
+        self.snake_groupbox.area2_line_edit.setText(self.compute_area(self.output_contour))
+        self.snake_groupbox.perimeter2_line_edit.setText(self.compute_perimeter(self.output_contour))
+        self.compute_chain_code()
+        self.snake_groupbox.export_label.setText("")
 
     def get_filtered_image(self):
         """
@@ -480,15 +502,31 @@ class Snake(QDoubleClickPushButton):
         """
         self.display_image()
         if not self.contour.size == 0:
-            self.ax2.plot(self.output_contour[:, 0], self.output_contour[:, 1], "ro")
-            self.ax1.plot(self.contour[:, 0], self.contour[:, 1], "ro-")
+            self.draw_contour(self.ax1, self.contour)
+            self.draw_contour(self.ax2, self.output_contour)
+            
+    
+    def draw_contour(self, ax, contour):
+        """
+        Description:
+            - To draw the given contour in the given subplot.
+        Args:
+            - subplot: The subplot that will be updated.
+            - contour: The contour that will be drawn.
+        """
+        ax.plot(contour[:, 0], contour[:, 1], 'ro-')
+        end_points_x = [contour[0, 0], contour[-1, 0]] 
+        end_points_y = [contour[0, 1], contour[-1, 1]] 
+        ax.plot(end_points_x,end_points_y, 'ro-')
+        self.ui.main_viewport_figure_canvas.draw()
+        
 
     def set_up_subplot(self, subplot, image, title):
         """
         Description:
             - To clear and redraw any of the two subplots without code repetition.
         Args:
-            - subplot: The subplot the will be updated.
+            - subplot: The subplot that will be updated.
             - image: The image that will be displayed.
             - title: The title of the subplot.
         """
@@ -508,3 +546,47 @@ class Snake(QDoubleClickPushButton):
         self.num_iterations = self.snake_groupbox.iterations_spinbox.value()
         self.frames = []
         self.display_output()
+
+    def compute_chain_code(self):  
+        if not np.array_equal(self.output_contour[0], self.output_contour[-1]):
+            contour = np.vstack((self.output_contour, self.output_contour[0]))
+        self.chain_code = list()
+
+        for i in range(len(contour[:-1])):
+            dx = contour[i + 1][0] - contour[i][0]
+            dy = contour[i + 1][1] - contour[i][1]
+            slope = round(np.arctan2(dy,dx) * 180/np.pi) # to degrees 
+            if slope < 0: 
+                slope += 360
+            for key,val in self.code_lookup_image_space.items():
+                if slope in val:
+                    self.chain_code.append(key)
+                    break
+
+    # Shoelace formula for computing the area enclosed with a set of points of defined coordinate points
+    def compute_area(self, contour):
+        x = contour[:, 0]
+        y = contour[:, 1]
+        area= 0.5 * np.abs(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1)))
+        return "{:.1f}".format(area)
+
+    # test case (square 2x2)
+    # contour_arc = np.array([
+    #     [0,0],
+    #     [2,0],[2,2],[0,2]])
+
+    def compute_perimeter(self, contour):
+        distances = np.sqrt(np.sum(np.diff(contour, axis=0)**2, axis=1))
+        perimeter = np.sum(distances) + np.linalg.norm(contour[-1] - contour[0]) # adding the Eucliden distance between the first and last points
+        return "{:.1f}".format(perimeter)
+    
+    def export_chain_code(self):
+        if self.chain_code == None:
+            self.snake_groupbox.export_label.setText("Chain code is empty!")
+            return
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save Chain Code", "", "Text Files (*.txt)")
+        if file_path:
+            with open(file_path, 'w') as f:
+                for code in self.chain_code:
+                    f.write(str(code) + '\n')
+        
