@@ -34,7 +34,8 @@
 
 ## Quick Preview
 
-#### [Write a title and add a gif below]
+### Browse Images
+![Browse Images](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/import_gif.gif)
 
 ## Shortcuts
 <center>
