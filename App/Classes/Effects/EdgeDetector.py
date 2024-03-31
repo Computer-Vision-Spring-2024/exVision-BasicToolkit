@@ -26,6 +26,12 @@ class EdgeDetector(QDoubleClickPushButton):
             "canny": self.canny,
             
         }
+        self.dirctions_lookup = {
+            "row_wise" :  list(range(339,361)) + list(range(0,23,1)) + list(range(158,203)),
+            "col_wise" : list(range(68,113)) + list(range(248, 293)),
+            "main_diagonal" : list(range(113,158)) + list(range(293,338)),
+            "secondary_diagonal": list(range(23,68)) + list(range(203, 248))
+        }
         self.current_working_image = None  # this represents the current image on which we will perform all operations (MUST BE GRAYSCALE)
         self.current_detector_type = "canny"  # default detector 
         self.edged_image = None  # output image 
@@ -306,45 +312,34 @@ class EdgeDetector(QDoubleClickPushButton):
         edged_image = self.convolve_2d(image, kernel, True)
         return edged_image
 
-    def non_maximum_suppression(self, gradient_magnitude, gradient_direction):
-        """
-        Suppress non-maximum gradients to thin edges in the input image.
-
-        Parameters:
-            gradient_magnitude (numpy.ndarray): The gradient magnitude image.
-            gradient_direction (numpy.ndarray): The gradient direction image.
-
-        Returns:
-            numpy.ndarray: The image after non-maximum suppression.
-        """
-        image_height, image_width = gradient_magnitude.shape
+    def non_maximum_suppression(self, magnitude, direction):
+        image_height, image_width = magnitude.shape
         suppressed_image = np.zeros((image_height, image_width), dtype=np.uint8)
+        angles = direction * 180 / np.pi
+        angles[angles < 0] += 360
 
-        angles_degrees = gradient_direction * 180 / np.pi
-        angles_degrees[angles_degrees < 0] += 180 
+        for i in range(1, image_height - 1): # row 
+            for j in range(1, image_width - 1): # col
+                q, r = 255, 255  
 
-        for i in range(1, image_height - 1):
-            for j in range(1, image_width - 1):
-                neighbor_intensity1, neighbor_intensity2 = 255, 255
+                if round(angles[i, j]) in self.dirctions_lookup["row_wise"] :
+                    r = magnitude[i, j - 1]
+                    q = magnitude[i, j + 1]
 
-                if (0 <= angles_degrees[i, j] < 22.5) or (157.5 <= angles_degrees[i, j] <= 180):
-                    neighbor_intensity2 = gradient_magnitude[i, j - 1]
-                    neighbor_intensity1 = gradient_magnitude[i, j + 1]
+                elif round(angles[i, j]) in self.dirctions_lookup["secondary_diagonal"]:
+                    r = magnitude[i - 1, j + 1]
+                    q = magnitude[i + 1, j - 1]
 
-                elif 22.5 <= angles_degrees[i, j] < 67.5:
-                    neighbor_intensity2 = gradient_magnitude[i - 1, j + 1]
-                    neighbor_intensity1 = gradient_magnitude[i + 1, j - 1]
+                elif round(angles[i, j]) in self.dirctions_lookup["col_wise"] :
+                    r = magnitude[i - 1, j]
+                    q = magnitude[i + 1, j]
 
-                elif 67.5 <= angles_degrees[i, j] < 112.5:
-                    neighbor_intensity2 = gradient_magnitude[i - 1, j]
-                    neighbor_intensity1 = gradient_magnitude[i + 1, j]
+                elif round(angles[i, j]) in self.dirctions_lookup["main_diagonal"] :
+                    r = magnitude[i + 1, j + 1]
+                    q = magnitude[i - 1, j - 1]
 
-                elif 112.5 <= angles_degrees[i, j] < 157.5:
-                    neighbor_intensity2 = gradient_magnitude[i + 1, j + 1]
-                    neighbor_intensity1 = gradient_magnitude[i - 1, j - 1]
-
-                if (gradient_magnitude[i, j] >= neighbor_intensity1) and (gradient_magnitude[i, j] >= neighbor_intensity2):
-                    suppressed_image[i, j] = gradient_magnitude[i, j]  # Keeping
+                if (magnitude[i, j] >= q) and (magnitude[i, j] >= r):
+                    suppressed_image[i, j] = magnitude[i, j]
                 else:
                     suppressed_image[i, j] = 0
 
