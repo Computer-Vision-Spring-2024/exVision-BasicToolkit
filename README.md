@@ -1,5 +1,5 @@
 # Image Alchemy
-[Add a brief]
+Image Alchemy is a powerful image processing application designed to simplify and enhance your digital imaging tasks. With a comprehensive set of features and an intuitive user interface
 
 ![App UI](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App_UI.png)
 
