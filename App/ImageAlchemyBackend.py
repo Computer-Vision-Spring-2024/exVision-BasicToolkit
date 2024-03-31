@@ -437,8 +437,8 @@ class Backend:
 
             else:
                 self.hide_all_groupboxes()
+                image_data = self.image_history.get(file_name)
                 if item.childCount() > 0:
-                    image_data = self.image_history.get(file_name)
                     # Loop over the children and display their groupboxes
                     for iterator in range(item.childCount()):
                         child = item.child(iterator)
