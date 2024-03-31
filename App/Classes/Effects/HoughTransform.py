@@ -116,11 +116,6 @@ class HoughTransform(QDoubleClickPushButton):
         self.output_image = self.calculate_hough()
         self.attibutes = self.attributes_dictionary()
         self.attributes_updated.emit(self.output_image)
-        print("Type:", self.type)
-        print("Threshold:", self.threshold)
-        print("Min Radius:", self.min_radius)
-        print("Max Radius:", self.max_radius)
-        print("Accumulator Threshold:", self.accumulator_threshold)
 
     def update_images(
         self,
