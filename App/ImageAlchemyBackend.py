@@ -1160,7 +1160,7 @@ class Backend:
             parent_item = QtWidgets.QTreeWidgetItem([file_name])
             if hasattr(self, "hybrid_object"):
                 temp_img = cv2.cvtColor(image_data.output_img, cv2.COLOR_BGR2RGB)
-                is_grayscale_hybrid = is_grayscale(self.image_data.output_img)
+                is_grayscale_hybrid = is_grayscale(image_data.output_img)
                 temp_img = self.convert_to_grayscale(
                     is_grayscale_hybrid, temp_img, temp_img
                 )

@@ -135,7 +135,6 @@ class Snake(QDoubleClickPushButton):
 
         # Redraw the canvas
         self.ui.main_viewport_figure_canvas.draw()
-        plt.ion()
 
     def resample_contour(self, contour, threshold_distance):
         """
