@@ -30,7 +30,14 @@
 - :heavy_check_mark: Convert to grayscale
 - :heavy_check_mark: Add 3 different types of noise
 - :heavy_check_mark: Filter Image with 3 different types of filters
-- :heavy_check_mark: 
+- :heavy_check_mark: Detect Edges in Images with 6 types of detectors
+- :heavy_check_mark: Apply High-pass and Low-pass Frequency Filters to Images
+- :heavy_check_mark: Apply Local and Global Threshold to Images
+- :heavy_check_mark: Normalize Images
+- :heavy_check_mark: Equalize Images
+- :heavy_check_mark: Active Contouring, Snake Algorithm
+- :heavy_check_mark: Create Hybrid Images
+- :heavy_check_mark: Perform Hough Transformations for Lines, Circles, and Ellipses
 
 ## Quick Preview
 
