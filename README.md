@@ -23,6 +23,19 @@
 #### [Write a title and add a gif below]
 
 ## ShortCuts
+<center>
+
+| Shortcut | Functionality |
+|----------|---------------|
+| Ctrl+I   | Import Image          |
+| Ctrl+S   | Save the output image of the current image as PNG         |
+| Shift+Ctrl+S   | Save the output image of the current image and specify the extension          |
+| Alt+S   | Save all the output images of the opened images          |
+| Ctrl+Q  | Exit the app |
+| Ctrl+C  | Show a guide on how to use the app (Currently unavailable) |
+| Ctrl+H  | Open the documentation of the app (Currently unavailable) |
+
+</center>
 
 ## Executing program
 
