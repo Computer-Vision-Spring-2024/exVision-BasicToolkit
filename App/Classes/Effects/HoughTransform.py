@@ -41,17 +41,14 @@ class HoughTransform(QDoubleClickPushButton):
             grayscale_image  # The grayscale image of the original image
         )
         self.edged_image = edgedImageData  # The image after canny edge detection
-        self.output_image = (
-            self.calculate_hough()
-        )  # The image after applying the effect
 
         # Default Line Detection Parameters
-        self.threshold = None
+        self.threshold = 101
         # Default Circle Detection Parameters
-        self.min_radius = None
-        self.max_radius = None
-        self.accumulator_threshold = None
-        self.min_dist = None
+        self.min_radius = 10
+        self.max_radius = 80
+        self.accumulator_threshold = 52
+        self.min_dist = 30
 
         # The group box that will contain the effect options
         self.hough_groupbox = HoughTransformGroupBox(self.title)
@@ -82,6 +79,9 @@ class HoughTransform(QDoubleClickPushButton):
         )
         self.hough_groupbox.min_dist_slider.valueChanged.connect(self.update_attributes)
 
+        self.output_image = (
+            self.calculate_hough()
+        )  # The image after applying the effect
         # Store the attributes of the effect to be easily stored in the images instances.
         self.attributes = self.attributes_dictionary()
 
@@ -105,8 +105,8 @@ class HoughTransform(QDoubleClickPushButton):
             - Updates the parameters of the hough transform effect depending on
                 the associated effect groupbox.
         """
-        self.type = self.hough_groupbox.hough_type_combo_box.currentText()
         self.threshold = self.hough_groupbox.line_threshold_spinbox.value()
+        self.type = self.hough_groupbox.hough_type_combo_box.currentText()
         self.min_radius = self.hough_groupbox.min_radius_spinbox.value()
         self.max_radius = self.hough_groupbox.max_radius_spinbox.value()
         self.accumulator_threshold = (
@@ -116,6 +116,11 @@ class HoughTransform(QDoubleClickPushButton):
         self.output_image = self.calculate_hough()
         self.attibutes = self.attributes_dictionary()
         self.attributes_updated.emit(self.output_image)
+        print("Type:", self.type)
+        print("Threshold:", self.threshold)
+        print("Min Radius:", self.min_radius)
+        print("Max Radius:", self.max_radius)
+        print("Accumulator Threshold:", self.accumulator_threshold)
 
     def update_images(
         self,
@@ -147,16 +152,11 @@ class HoughTransform(QDoubleClickPushButton):
             # Default Line Detection Parameters
             rho = 9
             theta = 0.261
-            self.threshold = 101
             lines = self.hough_line(-np.pi / 2, np.pi / 2, theta, rho)
             lines_img, _ = self.draw_lines(self.original_image, lines, cv2_setup=False)
             return lines_img
 
         elif self.type == "Circle":
-            self.min_radius = 10
-            self.max_radius = 80
-            self.accumulator_threshold = 52
-            self.min_dist = 30
             return self.hough_circle()
 
         elif self.type == "Ellipse":
