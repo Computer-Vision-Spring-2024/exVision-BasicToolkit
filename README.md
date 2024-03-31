@@ -43,6 +43,8 @@
 
 ### Browse Images
 ![Browse Images](README_resources/Import__gif.gif)
+### Apply and adjust local and global threshold effect
+![Apply and adjust local and global threshold effect](README_resources/thresholding.gif)
 
 ## Shortcuts
 <center>
