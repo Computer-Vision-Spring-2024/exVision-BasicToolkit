@@ -1,7 +1,7 @@
 # Image Alchemy
 [Add a brief]
 
-![App UI](README_resources\App_UI.png)
+![App UI](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App_UI.png)
 
 
 ## Table of Contents:
@@ -9,7 +9,7 @@
 - [Features](#project-features)
 - [Quick Preview](#quick-preview)
 - [Shortcuts](#shortcuts)
-- [App Structure](#app-files-structure)
+- [App Structure](#app-structure)
 - [Executing program](#executing-program)
 - [Future Updates](#future-updates)
 - [Help](#help)
