@@ -5,7 +5,6 @@ Image Alchemy is a powerful image processing application designed to simplify an
 
 
 ## Table of Contents:
-- [Description](#description)
 - [Features](#project-features)
 - [Quick Preview](#quick-preview)
 - [Shortcuts](#shortcuts)
@@ -15,10 +14,6 @@ Image Alchemy is a powerful image processing application designed to simplify an
 - [Help](#help)
 - [Contributors](#contributors)
 - [License](#license)
-
-## Description
-
-[Add a Description]
 
 ## Project Features
 :white_check_mark: **3 Ways to add an image to the viewport**
