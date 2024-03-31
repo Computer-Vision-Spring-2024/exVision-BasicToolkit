@@ -1,11 +1,12 @@
 # Image Alchemy
-
+[Add a brief and an image of the app]
 
 ## Table of Contents:
 - [Description](#description)
 - [Features](#project-features)
 - [Quick Preview](#quick-preview)
 - [Shortcuts](#shortcuts)
+- [App Files Structure](#app-files-structure)
 - [Executing program](#executing-program)
 - [Help](#help)
 - [Contributors](#contributors)
@@ -19,7 +20,12 @@
 - :heavy_check_mark: Using the import button in the **_File_** menu in the menu bar, or use the [shortcut](#shortcuts)
 - :heavy_check_mark: Drag and drop an image from your system
 - :heavy_check_mark: Pick an image from the library included in the **_Tools_** menu in the menu bar
-:white_check_mark: ****
+
+:white_check_mark: **Digital Image Processing Techniques**
+- :heavy_check_mark: Convert to grayscale
+- :heavy_check_mark: Add 3 different types of noise
+- :heavy_check_mark: Filter Image with 3 different types of filters
+- :heavy_check_mark: 
 
 ## Quick Preview
 
@@ -28,17 +34,20 @@
 ## Shortcuts
 <center>
 
-| Shortcut | Functionality |
-|----------|---------------|
-| Ctrl+I   | Import Image          |
-| Ctrl+S   | Save the output image of the current image as PNG         |
-| Shift+Ctrl+S   | Save the output image of the current image and specify the extension          |
-| Alt+S   | Save all the output images of the opened images          |
-| Ctrl+Q  | Exit the app |
-| Ctrl+C  | Show a guide on how to use the app (Currently unavailable) |
-| Ctrl+H  | Open the documentation of the app (Currently unavailable) |
+| Shortcut     | Functionality                                                        |
+|--------------|----------------------------------------------------------------------|
+| Ctrl+I       | Import Image                                                         |
+| Ctrl+S       | Save the output image of the current image as PNG                    |
+| Shift+Ctrl+S | Save the output image of the current image and specify the extension |
+| Alt+S        | Save all the output images of the opened images                      |
+| Ctrl+Q       | Exit the app                                                         |
+| Ctrl+C       | Show a guide on how to use the app (Currently unavailable)           |
+| Ctrl+H       | Open the documentation of the app (Currently unavailable)            |
 
 </center>
+
+## App Files Structure
+
 
 ## Executing program
 
