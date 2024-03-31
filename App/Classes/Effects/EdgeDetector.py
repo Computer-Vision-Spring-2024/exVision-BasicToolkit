@@ -1,10 +1,10 @@
 import matplotlib.colors as mcolors
 import numpy as np
-from PyQt5.QtCore import pyqtSignal
-
+from Classes.Effects.Filter import Filter
 from Classes.EffectsWidgets.EdgeDetectorGroupBox import EdgeDetectorGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-from Classes.Effects.Filter import Filter
+from PyQt5.QtCore import pyqtSignal
+
 
 class EdgeDetector(QDoubleClickPushButton):
     _instance_counter = 0
@@ -24,19 +24,20 @@ class EdgeDetector(QDoubleClickPushButton):
             "prewitt": self.prewitt,
             "laplacian": self.laplacian,
             "canny": self.canny,
-            
         }
         self.dirctions_lookup = {
-            "row_wise" :  list(range(339,361)) + list(range(0,23,1)) + list(range(158,203)),
-            "col_wise" : list(range(68,113)) + list(range(248, 293)),
-            "main_diagonal" : list(range(113,158)) + list(range(293,338)),
-            "secondary_diagonal": list(range(23,68)) + list(range(203, 248))
+            "row_wise": list(range(339, 361))
+            + list(range(0, 23, 1))
+            + list(range(158, 203)),
+            "col_wise": list(range(68, 113)) + list(range(248, 293)),
+            "main_diagonal": list(range(113, 158)) + list(range(293, 338)),
+            "secondary_diagonal": list(range(23, 68)) + list(range(203, 248)),
         }
         self.current_working_image = None  # this represents the current image on which we will perform all operations (MUST BE GRAYSCALE)
-        self.current_detector_type = "canny"  # default detector 
-        self.edged_image = None  # output image 
-        self.low_threshold_ratio=0.05 
-        self.high_threshold_ratio= 0.2
+        self.current_detector_type = "canny"  # default detector
+        self.edged_image = None  # output image
+        self.low_threshold_ratio = 0.09
+        self.high_threshold_ratio = 0.3
         self.edge_widget = EdgeDetectorGroupBox(self.title)
         # Pass the NoiseGroupBox instance to the Noise class
         self.edge_widget.edge_effect = self
@@ -67,44 +68,47 @@ class EdgeDetector(QDoubleClickPushButton):
         }
 
     def update_detector_type(self):
-        """ This method update the current detector type and apply the new detector on the current working image. """
+        """This method update the current detector type and apply the new detector on the current working image."""
         self.current_detector_type = (
             self.edge_widget.edge_widget_combo_box.currentText()
         )
-        self.low_threshold_ratio= self.edge_widget.low_threshold_spinbox.value()
-        self.high_threshold_ratio= self.edge_widget.high_threshold_spinbox.value()
+        self.low_threshold_ratio = self.edge_widget.low_threshold_spinbox.value()
+        self.high_threshold_ratio = self.edge_widget.high_threshold_spinbox.value()
         self.apply_detector()
-        self.attributes_updated.emit(self.edged_image) # emitting a signal of new edged image catptured, so that it gets displayed instead of the current one.
+        self.attributes_updated.emit(
+            self.edged_image
+        )  # emitting a signal of new edged image catptured, so that it gets displayed instead of the current one.
 
     def set_working_image(self, image):
         """
         Descripion:
-            set the current image that the edge detector object deals with. 
+            set the current image that the edge detector object deals with.
         Parameters:
         - image: numpy.ndarray
             The input image.
         """
         filter_effect = Filter("Gaussian", "5", 1, image)
-        filtered_image= filter_effect.output_image
-        self.current_working_image = filtered_image 
+        filtered_image = filter_effect.output_image
+        self.current_working_image = filtered_image
+
     # ----------------------------------------------------------------------------- Methods ------------------------------------------------------------------------
-   
+
     def apply_detector(self):
-        """   
+        """
         Descripion:
             - This is the master method, that calls the different detector, based on the current detector type selected.
         Returns:
             - numpy.ndarray
-                rgb image or grayscale image depending on the detector type. 
-         """
+                rgb image or grayscale image depending on the detector type.
+        """
         output_image = self.lookup[self.current_detector_type](
-            self.current_working_image # lookup dict returns a method corresponding to the selected detector type, then the current working image is passed as parameter. 
-        ) # this trick has been introduced to avoid code repetition or branching.
+            self.current_working_image  # lookup dict returns a method corresponding to the selected detector type, then the current working image is passed as parameter.
+        )  # this trick has been introduced to avoid code repetition or branching.
 
         if len(output_image) == 2:
             output_image = self.get_directed_image(
                 output_image
-            )  # if the output contains directionality list, then include it in output image. 
+            )  # if the output contains directionality list, then include it in output image.
 
         self.edged_image = output_image
 
@@ -124,9 +128,9 @@ class EdgeDetector(QDoubleClickPushButton):
         """
         mag = image[0]
         direction = image[1]
-        direction_normalized = direction / np.pi 
+        direction_normalized = direction / np.pi
         image_shape = image[0].shape
-        hue = direction_normalized * 360 
+        hue = direction_normalized * 360
         hsv_image = np.zeros((image_shape[0], image_shape[1], 3), dtype=np.uint8)
         hsv_image[..., 0] = hue.astype(np.uint8)
         hsv_image[..., 1] = mag.astype(np.uint8)
@@ -149,19 +153,21 @@ class EdgeDetector(QDoubleClickPushButton):
             numpy.ndarray: The padded image.
 
         """
-        padded_image = np.zeros((height + 2 * pad_size, width + 2 * pad_size)) # zeros matrix 
-        padded_image[pad_size:-pad_size, pad_size:-pad_size] = image  
+        padded_image = np.zeros(
+            (height + 2 * pad_size, width + 2 * pad_size)
+        )  # zeros matrix
+        padded_image[pad_size:-pad_size, pad_size:-pad_size] = image
         return padded_image
 
     def convolve_2d(self, image, kernel, multiply=True):
         """
-        Description: 
+        Description:
             - Perform 2D convolution on the input image with the given kernel.
 
         Parameters:
             - image (numpy.ndarray): The input image.
             - kernel (numpy.ndarray): The convolution kernel.
-            - multiply (bool, optional): Whether to multiply the kernel with the image region. 
+            - multiply (bool, optional): Whether to multiply the kernel with the image region.
                                     Defaults to True.
 
         Returns:
@@ -172,31 +178,37 @@ class EdgeDetector(QDoubleClickPushButton):
         kernel_size = kernel.shape[0]
         pad_size = kernel_size // 2
 
-        if pad_size == 0: # if the kernel size is 1 x 1 
-            padded_image = image 
-            normalize_value = 2 # the value by which we normalize the convolved region of image.
+        if pad_size == 0:  # if the kernel size is 1 x 1
+            padded_image = image
+            normalize_value = (
+                2  # the value by which we normalize the convolved region of image.
+            )
         else:
-            # padding the image to retain image size. 
-            normalize_value = kernel_size * kernel_size 
+            # padding the image to retain image size.
+            normalize_value = kernel_size * kernel_size
             padded_image = self.padding_image(
                 image, image_width, image_height, pad_size
             )
 
-        output_image = np.zeros_like(image) #  output image size == input image size
+        output_image = np.zeros_like(image)  #  output image size == input image size
 
         for i in range(image_height):
             for j in range(image_width):
-                neighborhood = padded_image[i : i + kernel_size, j : j + kernel_size ] # slice out the region
+                neighborhood = padded_image[
+                    i : i + kernel_size, j : j + kernel_size
+                ]  # slice out the region
 
                 # optimization trick (usage case maybe for average filter, where it's useless to multiply the kernel with the region)
                 if multiply:
                     output_image[i, j] = np.sum(neighborhood * kernel)
                 else:
                     output_image[i, j] = np.sum(neighborhood) * (1 / normalize_value)
-            
+
         return np.clip(output_image, 0, 255)
 
-    def get_edges_with_gradient_direction(self, image, x_kernel, y_kernel, rotated_coord=False):
+    def get_edges_with_gradient_direction(
+        self, image, x_kernel, y_kernel, rotated_coord=False
+    ):
         """
         Description:
             - Compute edges and gradient directions of the input image using the specified x and y kernels.
@@ -215,10 +227,12 @@ class EdgeDetector(QDoubleClickPushButton):
         """
         x_component = self.convolve_2d(image, x_kernel)
         y_component = self.convolve_2d(image, y_kernel)
-        resultant = np.abs(x_component) + abs(y_component) 
-        resultant = resultant / np.max(resultant) * 255 # image displayed 
-        direction = np.arctan2(y_component, x_component) 
-        if rotated_coord: # in case of roberts detector which compute gradient diagonal-wise
+        resultant = np.abs(x_component) + abs(y_component)
+        resultant = resultant / np.max(resultant) * 255  # image displayed
+        direction = np.arctan2(y_component, x_component)
+        if (
+            rotated_coord
+        ):  # in case of roberts detector which compute gradient diagonal-wise
             direction = (direction + np.pi / 4) % np.pi  # Wrap angles back to [0, π]
         return (resultant, direction)
 
@@ -278,7 +292,9 @@ class EdgeDetector(QDoubleClickPushButton):
         """
         secondary_diag = np.array([[0, 1], [-1, 0]])
         main_diag = np.rot90(secondary_diag)
-        return self.get_edges_with_gradient_direction(image, secondary_diag, main_diag, rotated_coord=True)  
+        return self.get_edges_with_gradient_direction(
+            image, secondary_diag, main_diag, rotated_coord=True
+        )
 
     def prewitt(self, image):
         """
@@ -318,11 +334,11 @@ class EdgeDetector(QDoubleClickPushButton):
         angles = direction * 180 / np.pi
         angles[angles < 0] += 360
 
-        for i in range(1, image_height - 1): # row 
-            for j in range(1, image_width - 1): # col
-                q, r = 255, 255  
+        for i in range(1, image_height - 1):  # row
+            for j in range(1, image_width - 1):  # col
+                q, r = 255, 255
 
-                if round(angles[i, j]) in self.dirctions_lookup["row_wise"] :
+                if round(angles[i, j]) in self.dirctions_lookup["row_wise"]:
                     r = magnitude[i, j - 1]
                     q = magnitude[i, j + 1]
 
@@ -330,11 +346,11 @@ class EdgeDetector(QDoubleClickPushButton):
                     r = magnitude[i - 1, j + 1]
                     q = magnitude[i + 1, j - 1]
 
-                elif round(angles[i, j]) in self.dirctions_lookup["col_wise"] :
+                elif round(angles[i, j]) in self.dirctions_lookup["col_wise"]:
                     r = magnitude[i - 1, j]
                     q = magnitude[i + 1, j]
 
-                elif round(angles[i, j]) in self.dirctions_lookup["main_diagonal"] :
+                elif round(angles[i, j]) in self.dirctions_lookup["main_diagonal"]:
                     r = magnitude[i + 1, j + 1]
                     q = magnitude[i - 1, j - 1]
 
@@ -364,7 +380,7 @@ class EdgeDetector(QDoubleClickPushButton):
         image_height, image_width = img.shape
         res = np.zeros((image_height, image_width), dtype=np.int32)
 
-        weak = np.int32(25) 
+        weak = np.int32(25)
         strong = np.int32(255)
 
         strong_i, strong_j = np.where(img >= highThreshold)
@@ -429,7 +445,7 @@ class EdgeDetector(QDoubleClickPushButton):
             numpy.ndarray: The output image with detected edges.
 
         """
-        edged_image = self.sobel_3x3(image) # [magnitude, direction]
+        edged_image = self.sobel_3x3(image)  # [magnitude, direction]
         suppressed_image = self.non_maximum_suppression(edged_image[0], edged_image[1])
         thresholded_image_info = self.threshold(suppressed_image)
         output_image = self.hysteresis(*thresholded_image_info)

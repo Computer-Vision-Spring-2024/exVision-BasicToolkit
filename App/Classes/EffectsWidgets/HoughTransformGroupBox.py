@@ -40,10 +40,10 @@ class HoughTransformGroupBox(QGroupBox):
         self.line_threshold_label = QLabel("Threshold")
         self.line_threshold_slider = QSlider(Qt.Horizontal)
         self.line_threshold_slider.setRange(0, 800)
-        self.line_threshold_slider.setValue(101)
+        self.line_threshold_slider.setValue(160)
         self.line_threshold_spinbox = QSpinBox()
         self.line_threshold_spinbox.setRange(0, 800)
-        self.line_threshold_spinbox.setValue(101)
+        self.line_threshold_spinbox.setValue(160)
         self.line_threshold_slider.valueChanged.connect(
             self.line_threshold_spinbox.setValue
         )
@@ -133,9 +133,8 @@ class HoughTransformGroupBox(QGroupBox):
         self.ellipse_attributes_hbox = QHBoxLayout()
         self.ellipse_detector_type_label = QLabel("Detector Type")
         self.ellipse_detector_type_combobox = QComboBox()
-        self.ellipse_detector_type_combobox.addItems(
-            ["Scikit-image", "OpenCV", "From Scratch"]
-        )
+        self.ellipse_detector_type_combobox.addItems(["From Scratch", "Scikit-image"])
+        self.ellipse_detector_type_combobox.setCurrentIndex(1)
         self.ellipse_attributes_hbox.addWidget(self.ellipse_detector_type_label)
         self.ellipse_attributes_hbox.addWidget(self.ellipse_detector_type_combobox)
 

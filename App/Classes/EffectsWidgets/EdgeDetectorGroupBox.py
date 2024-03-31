@@ -34,7 +34,7 @@ class EdgeDetectorGroupBox(QGroupBox):
         self.low_threshold_spinbox = QDoubleSpinBox()
         self.low_threshold_spinbox.setSingleStep(0.01)
         # Intialize a value for BETA
-        self.low_threshold_spinbox.setValue(0.05)
+        self.low_threshold_spinbox.setValue(0.09)
         lowthreshold_HLayout = QHBoxLayout()
         lowthreshold_HLayout.addWidget(self.low_threshold_label)
         lowthreshold_HLayout.addWidget(self.low_threshold_spinbox)
@@ -43,7 +43,7 @@ class EdgeDetectorGroupBox(QGroupBox):
         self.high_threshold_spinbox = QDoubleSpinBox()
         self.high_threshold_spinbox.setSingleStep(0.01)
         # Intialize a value for BETA
-        self.high_threshold_spinbox.setValue(0.2)
+        self.high_threshold_spinbox.setValue(0.3)
         highthreshold_HLayout = QHBoxLayout()
         highthreshold_HLayout.addWidget(self.high_threshold_label)
         highthreshold_HLayout.addWidget(self.high_threshold_spinbox)

@@ -1,3 +1,4 @@
+import math
 import typing as tp
 from collections import defaultdict
 
@@ -5,9 +6,10 @@ import cv2
 import numpy as np
 from Classes.EffectsWidgets.HoughTransformGroupBox import HoughTransformGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 from skimage import color, img_as_ubyte
 from skimage.draw import ellipse_perimeter
+from skimage.feature import canny
 from skimage.transform import hough_ellipse
 
 
@@ -43,7 +45,7 @@ class HoughTransform(QDoubleClickPushButton):
         self.edged_image = edgedImageData  # The image after canny edge detection
 
         # Default Line Detection Parameters
-        self.threshold = 101
+        self.threshold = 160
         # Default Circle Detection Parameters
         self.min_radius = 10
         self.max_radius = 80
@@ -78,6 +80,9 @@ class HoughTransform(QDoubleClickPushButton):
             self.update_attributes
         )
         self.hough_groupbox.min_dist_slider.valueChanged.connect(self.update_attributes)
+        self.hough_groupbox.ellipse_detector_type_combobox.currentIndexChanged.connect(
+            self.update_attributes
+        )
 
         self.output_image = (
             self.calculate_hough()
@@ -145,7 +150,7 @@ class HoughTransform(QDoubleClickPushButton):
     def calculate_hough(self):
         if self.type == "Line":
             # Default Line Detection Parameters
-            rho = 9
+            rho = 7
             theta = 0.261
             lines = self.hough_line(-np.pi / 2, np.pi / 2, theta, rho)
             lines_img, _ = self.draw_lines(self.original_image, lines, cv2_setup=False)
@@ -155,7 +160,13 @@ class HoughTransform(QDoubleClickPushButton):
             return self.hough_circle()
 
         elif self.type == "Ellipse":
-            return self.hough_ellipse()
+            if (
+                self.hough_groupbox.ellipse_detector_type_combobox.currentText()
+                == "From Scratch"
+            ):
+                return self.ellipse_output_image_from_scratch()
+            else:
+                return self.hough_ellipse_using_scikit_image()
 
     def hough_line(
         self,
@@ -295,9 +306,11 @@ class HoughTransform(QDoubleClickPushButton):
 
         return superimposed_circles_image
 
-    def hough_ellipse(self):
+    def hough_ellipse_using_scikit_image(self):
+        image_gray = color.rgb2gray(self.original_image)
+        edges = canny(image_gray, sigma=2.0, low_threshold=0.55, high_threshold=0.8)
         result = hough_ellipse(
-            self.edged_image, accuracy=20, threshold=250, min_size=100, max_size=120
+            edges, accuracy=20, threshold=250, min_size=100, max_size=120
         )
         result.sort(order="accumulator")
 
@@ -317,7 +330,90 @@ class HoughTransform(QDoubleClickPushButton):
         )
         result_image[y_indices_of_ellipses, x_indices_of_ellipses] = (0, 0, 255)
 
-        return result_image
+        self.output_image = result_image
+        return self.output_image
+
+    def hough_ellipse_from_scratch(self, img, min2a=10, min_votes=10):
+        width, height = img.shape
+
+        # Finding all nonzero pixels of the image, possible ellipse's pixels.
+        ys, xs = np.nonzero(img)
+        pixels = np.column_stack((xs, ys))
+
+        # Accumulator for the minor axis' half-length. The indexes correspond to the possible b values.
+        # TODO: the data structure can be improved (e.g., using a dictionary or a tree).
+        acc = np.zeros(int(max(width, height) / 2))
+
+        # Iterate through pairs of non-zero pixels
+        for ij1 in range(len(xs) - 1):
+            for ij2 in range(len(xs) - 1, ij1, -1):
+                x1, y1 = pixels[ij1]
+                x2, y2 = pixels[ij2]
+                d12 = np.linalg.norm(np.array([x1, y1]) - np.array([x2, y2]))
+
+                if d12 > min2a:
+                    # Center
+                    x0 = (x1 + x2) / 2
+                    y0 = (y1 + y2) / 2
+                    # Half-length of the major axis
+                    a = d12 / 2
+                    # Orientation
+                    alpha = math.atan2((y2 - y1), (x2 - x1))
+                    # Iterate through all other non-zero pixels
+                    for ij3 in range(len(xs)):
+                        # The third point must be a different point
+                        if ij3 == ij1 or ij3 == ij2:
+                            continue
+                        x3, y3 = pixels[ij3]
+                        d03 = np.linalg.norm(np.array([x3, y3]) - np.array([x0, y0]))
+                        if d03 >= a:
+                            continue
+                        f = np.linalg.norm(np.array([x3, y3]) - np.array([x2, y2]))
+                        cos2_tau = ((a**2 + d03**2 - f**2) / (2 * a * d03)) ** 2
+                        sin2_tau = 1 - cos2_tau
+                        b = round(
+                            math.sqrt(
+                                (a**2 * d03**2 * sin2_tau) / (a**2 - d03**2 * cos2_tau)
+                            )
+                        )
+                        if 0 < b < len(acc):
+                            acc[int(b)] += 1
+
+                    # Taking the highest score
+                    max_votes = np.max(acc)
+                    if max_votes > min_votes:
+                        # Ellipse detected
+                        si = np.argmax(acc)
+                        parameters = [x0, y0, a, si, alpha]
+                        return parameters
+
+        print("No ellipses detected!")
+        return None
+
+    def ellipse_output_image_from_scratch(self):
+
+        img = cv2.Canny(self.original_image, 100, 200)
+
+        parameters = self.hough_ellipse_from_scratch(img)
+        # Define the parameters of the ellipse
+        center = (
+            int(parameters[0]),
+            int(parameters[1]),
+        )  # Convert center coordinates to integers
+        axes = (
+            int(parameters[2]) * 2,
+            parameters[3] * 2,
+        )  # Convert major axis length to integer
+        angle = np.degrees(parameters[4])  # Convert angle from radians to degrees
+
+        # Load the image
+        image = np.copy(self.original_image)
+
+        # Draw the ellipse on the image
+        self.output_image = cv2.ellipse(
+            image, center, axes, 255 - angle, 0, 360, (0, 255, 0), 2
+        )
+        return self.output_image
 
     # Line Transform Helper Functions
     def draw_lines(
@@ -345,6 +441,9 @@ class HoughTransform(QDoubleClickPushButton):
         superimposed_lines_image = np.copy(img)
         empty_image = np.zeros(img.shape[:2])
 
+        if len(lines) == 0:
+            return superimposed_lines_image, empty_image
+
         if len(lines.shape) == 1:
             lines = lines[None, ...]
 
@@ -365,6 +464,8 @@ class HoughTransform(QDoubleClickPushButton):
         for i in range(mask_lines.shape[0]):
             line = mask_lines[i]
             indices = np.argwhere(line)
+            if len(indices) == 0:
+                continue
             if indices[-1] - indices[0] < min_diff:
                 min_diff = indices[-1] - indices[0]
                 max_line = i
