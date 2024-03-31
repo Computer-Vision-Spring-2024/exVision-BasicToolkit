@@ -35,7 +35,7 @@
 ## Quick Preview
 
 ### Browse Images
-![Browse Images](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/import_gif.gif)
+![Browse Images](README_resources/Import__gif.gif)
 
 ## Shortcuts
 <center>
