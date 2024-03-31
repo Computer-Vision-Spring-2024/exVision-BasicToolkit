@@ -5,7 +5,7 @@
 - [Description](#description)
 - [Features](#project-features)
 - [Quick Preview](#quick-preview)
-- [ShortCuts](#short_cuts)
+- [Shortcuts](#shortcuts)
 - [Executing program](#executing-program)
 - [Help](#help)
 - [Contributors](#contributors)
@@ -15,14 +15,17 @@
 
 
 ## Project Features
+:white_check_mark: **3 Ways to add an image to the viewport**
+- :heavy_check_mark: Using the import button in the **_File_** menu in the menu bar, or use the [shortcut](#shortcuts)
+- :heavy_check_mark: Drag and drop an image from your system
+- :heavy_check_mark: Pick an image from the library included in the **_Tools_** menu in the menu bar
 :white_check_mark: ****
-- :heavy_check_mark: 
 
 ## Quick Preview
 
 #### [Write a title and add a gif below]
 
-## ShortCuts
+## Shortcuts
 <center>
 
 | Shortcut | Functionality |
@@ -75,4 +78,4 @@ Gratitude goes out to all team members for their valuable contributions to this 
 
 ## License
 
-All rights reserved © 2023 to Team 19 - Systems & Biomedical Engineering, Cairo University (Class 2025)
+All rights reserved © 2024 to Team 02 - Systems & Biomedical Engineering, Cairo University (Class 2025)
