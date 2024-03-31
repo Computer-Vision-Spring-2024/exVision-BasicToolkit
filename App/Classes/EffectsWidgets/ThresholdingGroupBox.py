@@ -26,6 +26,7 @@ class ThresholdingGroupBox(QGroupBox):
         self.threshold_type_label = QLabel("Threshold Type")
         self.threshold_type_comb = QComboBox()
         self.threshold_type_comb.addItems(["Local", "Global"])
+        self.threshold_type_comb.setCurrentIndex(0)
         self.threshold_type_comb.currentIndexChanged.connect(
             self.update_threshold_options
         )
@@ -36,6 +37,7 @@ class ThresholdingGroupBox(QGroupBox):
         self.block_size_label = QLabel("Block Size")
         self.block_size_slider = QSlider(Qt.Horizontal)
         self.block_size_spinbox = QSpinBox()
+        self.block_size_spinbox.setValue(9)
         self.block_size_slider.valueChanged.connect(self.block_size_spinbox.setValue)
         self.block_size_spinbox.valueChanged.connect(self.block_size_slider.setValue)
         self.block_size_HLayout = QHBoxLayout()
