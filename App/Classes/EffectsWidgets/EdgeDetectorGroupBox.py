@@ -1,4 +1,11 @@
-from PyQt5.QtWidgets import QComboBox, QGroupBox, QHBoxLayout, QLabel, QVBoxLayout, QDoubleSpinBox
+from PyQt5.QtWidgets import (
+    QComboBox,
+    QDoubleSpinBox,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QVBoxLayout,
+)
 
 
 class EdgeDetectorGroupBox(QGroupBox):
@@ -19,6 +26,7 @@ class EdgeDetectorGroupBox(QGroupBox):
             "canny",
         ]
         self.edge_widget_combo_box.addItems(self.lookup)
+        self.edge_widget_combo_box.setCurrentIndex(5)
         hbox = QHBoxLayout()
         hbox.addWidget(self.label)
         hbox.addWidget(self.edge_widget_combo_box)
@@ -30,7 +38,7 @@ class EdgeDetectorGroupBox(QGroupBox):
         lowthreshold_HLayout = QHBoxLayout()
         lowthreshold_HLayout.addWidget(self.low_threshold_label)
         lowthreshold_HLayout.addWidget(self.low_threshold_spinbox)
-        
+
         self.high_threshold_label = QLabel("High Threshold Ratio")
         self.high_threshold_spinbox = QDoubleSpinBox()
         self.high_threshold_spinbox.setSingleStep(0.01)
@@ -40,7 +48,6 @@ class EdgeDetectorGroupBox(QGroupBox):
         highthreshold_HLayout.addWidget(self.high_threshold_label)
         highthreshold_HLayout.addWidget(self.high_threshold_spinbox)
 
-        
         self.main_layout.addLayout(hbox)
         self.main_layout.addLayout(lowthreshold_HLayout)
         self.main_layout.addLayout(highthreshold_HLayout)

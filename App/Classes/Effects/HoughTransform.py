@@ -2,17 +2,16 @@ import typing as tp
 from collections import defaultdict
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 from Classes.EffectsWidgets.HoughTransformGroupBox import HoughTransformGroupBox
+from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 from PyQt5.QtCore import QObject, pyqtSignal
-from skimage import color, data, img_as_ubyte
+from skimage import color, img_as_ubyte
 from skimage.draw import ellipse_perimeter
-from skimage.feature import canny
 from skimage.transform import hough_ellipse
 
 
-class HoughTransform(QObject):
+class HoughTransform(QDoubleClickPushButton):
     _instance_counter = 0
     attributes_updated = pyqtSignal(np.ndarray)
 
@@ -31,6 +30,7 @@ class HoughTransform(QObject):
         # For naming the instances of the effect
         HoughTransform._instance_counter += 1
         self.title = f"HoughTransform.{HoughTransform._instance_counter:03d}"
+        self.setText(self.title)
 
         # Attributes
         self.type = type  # The type of boundary the user wants to detect "line", "circle", or "ellipse"
@@ -52,7 +52,6 @@ class HoughTransform(QObject):
         self.max_radius = None
         self.accumulator_threshold = None
         self.min_dist = None
-        # Default Ellipse Detection Parameters
 
         # The group box that will contain the effect options
         self.hough_groupbox = HoughTransformGroupBox(self.title)
@@ -117,6 +116,31 @@ class HoughTransform(QObject):
         self.output_image = self.calculate_hough()
         self.attibutes = self.attributes_dictionary()
         self.attributes_updated.emit(self.output_image)
+
+    def update_images(
+        self,
+        imageData,
+        grayscale_image,
+        edgedImageData,
+    ):
+        """
+        Description:
+            -   To be able to re-use the same instance with new image.
+                It updates the images used by the Hough transform and emits the new output image.
+                That is made to be able to update the Hough transform if the user changed the parameters
+                if the edge detection or the filtration that is performed before instantiating the Hough effect.
+
+        Args:
+            -   imageData: The new original image.
+            -   grayscale_image: The new grayscale image.
+            -   edgedImageData: The new edged image.
+        """
+        self.original_image = imageData
+        self.grayscale_image = grayscale_image
+        self.edged_image = edgedImageData
+        self.output_image = self.calculate_hough()  # Recalculate output image
+        self.attributes["output"] = self.output_image  # Update attributes dictionary
+        self.attributes_updated.emit(self.output_image)  # Emit signal to update GUI
 
     def calculate_hough(self):
         if self.type == "Line":
@@ -299,36 +323,6 @@ class HoughTransform(QObject):
         result_image[y_indices_of_ellipses, x_indices_of_ellipses] = (0, 0, 255)
 
         return result_image
-
-    def hough_ellipse(self):
-        result = hough_ellipse(
-            self.edged_image, accuracy=20, threshold=250, min_size=100, max_size=120
-        )
-        result.sort(order="accumulator")
-
-        # Estimated parameters for the ellipse
-        best_estimated_parameters = list(result[-1])
-        y_center, x_center, minor_axis_radius, major_axis_radius = (
-            int(round(x)) for x in best_estimated_parameters[1:5]
-        )
-        orientation = best_estimated_parameters[5]
-
-        # Create a copy of the original image
-        result_image = np.copy(self.original_image)
-
-        # Draw the ellipse on the copied image
-        y_indices_of_ellipses, x_indices_of_ellipses = ellipse_perimeter(
-            y_center, x_center, minor_axis_radius, major_axis_radius, orientation
-        )
-        result_image[y_indices_of_ellipses, x_indices_of_ellipses] = (0, 0, 255)
-
-        # Convert the edged image to RGB for visualization
-        edged_rgb = color.gray2rgb(img_as_ubyte(self.edged_image))
-
-        # Draw the edge (white) and the resulting ellipse (red)
-        edged_rgb[y_indices_of_ellipses, x_indices_of_ellipses] = (250, 0, 0)
-
-        return result_image, edged_rgb
 
     # Line Transform Helper Functions
     def draw_lines(

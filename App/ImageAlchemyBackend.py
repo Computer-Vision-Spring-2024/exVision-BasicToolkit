@@ -644,6 +644,12 @@ class Backend:
         Descripion:
             - Convert an image to grayscale and display the image after conversion.
         """
+        if self.current_image_data is None:
+            self.show_message(
+                "Error", "Please load an image first.", QMessageBox.Critical
+            )
+            return
+
         self.grayscale_image = self.convert_to_grayscale(
             self.is_grayscale, self.grayscale_image, self.current_image_data
         )
@@ -1089,11 +1095,17 @@ class Backend:
         self.update_table()
 
     def hough(self):
-        """
-        Description:
-            -   Apply a boundary detection "Hough Transform" algorithm on the current image.
-                The available options till now: Line, Circle, and Ellipse
-        """
+        # Define a function to update the edged image
+        def update_edged_image(new_edged_image):
+            nonlocal edged_image
+            edged_image = new_edged_image
+            # Update the Hough Transform with the new edged image
+            hough_effect.update_images(self.current_image_data, self.grayscale_image, edged_image)
+            # Update the displayed image
+            self.current_image.set_output_image(self.output_image)
+            self.display_image(self.current_image_data, self.output_image)
+
+        # Check for image data
         if self.current_image_data is None:
             self.show_message(
                 "Error", "Please load an image first.", QMessageBox.Critical
@@ -1103,46 +1115,28 @@ class Backend:
         if self._check_conversion() == 0:
             return
 
-        # Convert the image to 8-bit unsigned integer
-        # self.grayscale_image = np.uint8(self.grayscale_image)
-
-        # Initialize a group box that will contain the parameters of filter, edge detector, and hough
+        # Initialize the Hough Transform editing pack group box
         hough_collection_groupbox = QtWidgets.QGroupBox("HT Editing Pack")
         hough_collection_groupbox_vbox = QtWidgets.QVBoxLayout()
-        hough_collection_groupbox.setLayout(
-            hough_collection_groupbox_vbox
-        )  # Set the layout
+        hough_collection_groupbox.setLayout(hough_collection_groupbox_vbox)
         self.ui.scroll_area_VLayout.insertWidget(0, hough_collection_groupbox)
-
-        # Filter the image to reduce the noise
-        filter_effect = Filter("Mean", "3", 0, self.grayscale_image)
-        filtered_image = filter_effect.output_image
-        hough_collection_groupbox_vbox.addWidget(filter_effect.filter_groupbox)
 
         # Detect edges in the filtered image using Canny
         edge_detector = EdgeDetector()
-        edged_image = edge_detector.canny(filtered_image)
+        edge_detector.set_working_image(self.grayscale_image)
+        edged_image = edge_detector.apply_detector()
         hough_collection_groupbox_vbox.addWidget(edge_detector.edge_widget)
 
-        # Connect the "Apply" Buttons to functions that takes the new images and apply the hough transform
-        edge_detector.attributes_updated.connect(
-            self.update_edge_detection_for_hough_transform
-        )
+        # Connect the attributes_updated signal of the edge detector to update the edged image
+        edge_detector.attributes_updated.connect(update_edged_image)
 
-        # Apply Hough Transform
-        self.apply_hough_transform(edged_image)
-
-    def update_edge_detection_for_hough_transform(self, new_edged_image):
-        self.apply_hough_transform(new_edged_image)
-
-    def apply_hough_transform(self, edged_image):
         # Apply Hough Transform
         hough_effect = HoughTransform(
             "Line", self.current_image_data, self.grayscale_image, edged_image
         )
-        # Hough Effect Signal
+        # Connect signals
         hough_effect.attributes_updated.connect(self.update_output_image)
-        # Get the output image after applying the hough tranform
+        # Get the output image after applying the Hough transform
         self.output_image = hough_effect.output_image
         # UI Changes and Setters
         self.ui.scroll_area_VLayout.insertWidget(0, hough_effect.hough_groupbox)

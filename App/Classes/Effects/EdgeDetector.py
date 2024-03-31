@@ -27,7 +27,7 @@ class EdgeDetector(QDoubleClickPushButton):
             
         }
         self.current_working_image = None  # this represents the current image on which we will perform all operations (MUST BE GRAYSCALE)
-        self.current_detector_type = "sobel_3x3"  # default detector 
+        self.current_detector_type = "canny"  # default detector 
         self.edged_image = None  # output image 
         self.low_threshold_ratio=0.05 
         self.high_threshold_ratio= 0.2

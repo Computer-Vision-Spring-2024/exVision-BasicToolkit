@@ -17,6 +17,7 @@ The app UI meant to be similar to Photoshop UI. It has different sections, each 
 - Open the same image more than once.
 - When you expand or collapse the control panel, the expanded or the collapsed view of the effects menu appears for a second.
 - Themes Feature.
+- Make it responsive.
 
 ### Digital Image Processing Functions (DIPFs):
 _That means "Is this effect was integrated in the app or not?"._
@@ -47,6 +48,7 @@ _That means "Is this effect was integrated in the app or not?"._
 - Histogram Tabs
     - Openning multiple histogram tabs for the same image 
     - Defining to which image does the tab belong to in its title probably
+- In the groupboxes of the effects, the parameters controllers (e.g. sliders and spinboxes) are not actually set to the default values defined in the effect class
 
 ## Done:
 
