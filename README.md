@@ -8,9 +8,9 @@ ImageAlchemy - A PyQT5-based image processing application offering a variety of 
 - [Description](#description)
 - [Features](#project-features)
 - [Quick Preview](#quick-preview)
-- [Shortcuts](#shortcuts)
 - [App Structure](#app-structure)
 - [Executing program](#executing-program)
+- [Shortcuts](#shortcuts)
 - [Future Updates](#future-updates)
 - [Help](#help)
 - [Contributors](#contributors)
@@ -70,7 +70,33 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 ## App Structure
 <table>
   <tr>
-    <td>Structure's Description: The files and our usage of OOP and how the classes communicate or managed by the backend
+    <td><p>
+      
+**Folder Structure**
+
+**_Classes_**
+- DialogTheme: This folder contains only the dialog class that appears to the user when he wants to change the appearance of the app.
+
+- Effects: This directory houses classes, each representing a specific image processing effect.
+
+- EffectsWidgets: Within this folder are classes inheriting from GroupBox, designed to streamline the integration of effect controllers (e.g., sliders, spinboxes) into the user interface. Upon applying an effect, an instance of the corresponding groupbox is instantiated and added to the UI, allowing users to adjust parameters and observe resulting changes in real-time.
+
+- ExtendedWidgets: This directory contains custom widgets developed to address specific developmental challenges, tailored for internal use by developers rather than end-users.
+
+**_Resources_**
+- Icons: This folder contains the icons used in the stylesheets of the app.
+
+- ImagesLibrary: An assortment of image examples categorized into Classic, Old classic, Fingerprints, High Resolution, Medical, Special, Sun and Planets, Textures images, Additional. Users can utilize these images to test various effects.
+
+- HoughSamples: Sanple images to test the Hough Transformation algorithm. These are organized into 3 subfolders for each type of Hough Transformation: Line, Circle, and Ellipse.
+
+- Themes: (under development): Currently in progress, this section will incorporate multiple stylesheets or themes, enabling users to customize the appearance of the application, although this feature is not yet accessible for use.
+
+**_Main Files in the root_**:
+
+**ImageAlchemyUI.py**: The user interface file, housing fixed UI components of the application, which can be dynamically modified during runtime. This serves as the primary file executed to launch the application.
+
+**ImageAlchemyBackend.py (Backend & Image Class)**: This file encapsulates the core functionality of the application, orchestrating interactions between the user interface and backend processing. Upon user selection of an effect, the backend instantiates the corresponding effect class, passes inputs, retrieves output images, and manages image history by creating instances of the image class and storing relevant attributes and applied effects.</p>
     </td>
     <td>
 
