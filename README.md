@@ -6,11 +6,12 @@ ImageAlchemy - A PyQT5-based image processing application offering a variety of 
 
 ## Table of Contents:
 - [Description](#description)
-- [Features](#project-features)
+- [Features](#features)
 - [Quick Preview](#quick-preview)
-- [App Flow](#app-flow)
+- [User Interface Structure](#user_interface_structure)
 - [Folder Structure](#folder-structure)
 - [Executing program](#executing-program)
+- [App Flow](#app_flow)
 - [Shortcuts](#shortcuts)
 - [Future Updates](#future-updates)
 - [Help](#help)
@@ -20,7 +21,7 @@ ImageAlchemy - A PyQT5-based image processing application offering a variety of 
 ## Description
 ImageAlchemy is a comprehensive image processing application developed using PyQT5, providing a range of powerful techniques including grayscale conversion, noise addition, various filters, edge detection, thresholding, equalization, active contouring using Snake Algorithm, hybrid image creation, and Hough transformations. Remarkably, all functionalities are implemented from scratch, avoiding dependency on external libraries like OpenCV or Scikit-Image, ensuring a lightweight and self-contained solution for digital image processing needs.
 
-## Project Features
+## Features
 :white_check_mark: **3 Ways to add an image to the viewport**
 - :heavy_check_mark: Using the import button in the **_File_** menu in the menu bar, or use the [shortcut](#shortcuts)
 - :heavy_check_mark: Drag and drop an image from your system
@@ -62,25 +63,43 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 <div align="center">
 
 ![Apply and adjust local and global threshold effect](README_resources/Thresholding.gif)</div>
-## Shortcuts
 
-<div align="center">
-
-| Shortcut     | Functionality                                                        |
-|--------------|----------------------------------------------------------------------|
-| Ctrl+I       | Import Image                                                         |
-| Ctrl+S       | Save the output image of the current image as PNG                    |
-| Shift+Ctrl+S | Save the output image of the current image and specify the extension |
-| Alt+S        | Save all the output images of the opened images                      |
-| Ctrl+Q       | Exit the app                                                         |
-| Ctrl+C       | Show a guide on how to use the app (Currently unavailable)           |
-| Ctrl+H       | Open the documentation of the app (Currently unavailable)            |
-
-</div>
-
-## App Flow
+## User Interface Structure
 
 ![App Flow](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App_Flow.png)
+
+The provided image serves as a guide to understanding the various sections of our app's interface. Below, we'll delve into each section's functionality and elucidate how users can navigate and utilize the app effectively.
+
+**`Menu Bar`**:
+Contained within this bar are four distinct menus:
+
+1. **File Menu**: Primarily responsible for importing images, saving options for edited image outputs, and exiting the application.
+
+2. **Edit Menu**: Under development, intended for customizing the app interface's appearance. Presently, it has no visible impact on the app.
+
+3. **Tools Menu**: This menu currently houses the image library and examples for users to experiment with different image processing techniques.
+
+4. **Help Menu**: Provides options to access the application's documentation and a guide on app usage. These features are currently unavailable as the app is still in development.
+
+**`Main Viewport`**:
+
+The viewport serves the purpose of displaying both the imported input image and the output image post-application of various processing techniques. Essentially, it functions as a tab, offering developers the flexibility to incorporate additional tabs for specific steps or plots related to certain effects in the future.
+
+**`Image Tree`**:
+
+Designed to facilitate the seamless navigation between different images and their associated effects, the image tree displays imported images along with their respective effects. Users can simply double-click on an image name within the tree to revert to a previously opened image.
+
+**`Effects to Add`**:
+
+This section features buttons representing specific effects. Users can expand the menu to view the names of each effect and add them to the current image by double-clicking the desired effect.
+
+**`Effects Tweaking Menu`**:
+
+Tailored to accommodate the specific attributes and parameters of each image processing technique, this menu displays controllers for adjusting these parameters. By default, it showcases the parameters of all effects applied to all images, organized within group boxes. However, users have the flexibility to focus on specific effects by double-clicking on their names within the tree.
+
+**`Added Effects Table`**:
+
+Currently unavailable in the app version provided, this table is under development. It will showcase the effects added to the current image, allowing users to create cumulative outputs if desired. Users can manipulate the table to show or hide all effects, revert to the original imported image, or remove specific effects. Furthermore, they can adjust the order of applied effects in the cumulative pipeline by dragging rows. Double-clicking on an effect will open a new tab exclusively visualizing the output of that effect, including any intermediate steps typically hidden from users.
 
 ## Folder Structure
 <table>
@@ -187,6 +206,44 @@ To be able to use our app, you can simply follow these steps:
 pip install -r requirements.txt
 ```
 3. Run the file with the name "ImageAlchemyUI.py"
+
+## App Flow
+
+1. **Importing an Image**:
+
+   You can import an image in three ways: drag and drop, through the file menu, or by accessing the included image library within the app.
+
+3. **Applying Effects**:
+
+   Simply **double-click** on the desired effect from the left sidebar. You can expand the sidebar to view the full names of each effect or hover over them to see a tooltip displaying their names.
+
+3. **Fine-Tuning Effects**:
+
+   In the right-side panel, double-click on the effect's name from the tree. This will open a menu displaying all the parameters and controls. Adjust these to achieve the desired result.
+
+5. **Navigating Images**:
+
+   Easily switch between different images by double-clicking their names in the image tree located in the right-side menu.
+
+5. **Saving Output**:
+
+   To save the output image, simply press CTRL+S or access the save option from the File menu in the menu bar.
+
+## Shortcuts
+
+<div align="center">
+
+| Shortcut     | Functionality                                                        |
+|--------------|----------------------------------------------------------------------|
+| Ctrl+I       | Import Image                                                         |
+| Ctrl+S       | Save the output image of the current image as PNG                    |
+| Shift+Ctrl+S | Save the output image of the current image and specify the extension |
+| Alt+S        | Save all the output images of the opened images                      |
+| Ctrl+Q       | Exit the app                                                         |
+| Ctrl+C       | Show a guide on how to use the app (Currently unavailable)           |
+| Ctrl+H       | Open the documentation of the app (Currently unavailable)            |
+
+</div>
 
 ## Future Updates
 In upcoming releases, we are planning to introduce a significant enhancement to our application by implementing cumulative effects output. This feature will revolutionize the image processing workflow by seamlessly integrating multiple effects. Specifically, the output generated by the first applied effect will serve as the input for subsequent effects. Also, we are working now on enhancing the app's performance to suit Computationally weak devices. All that besides, new processing techniques are coming soon.
