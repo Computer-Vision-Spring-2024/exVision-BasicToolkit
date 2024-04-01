@@ -106,60 +106,76 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
     <td>
 
     --- Folder Structure ---
-    [Classes]
-        ├── [DialogTheme]
-            ├── ThemeDialog.py
-            └── ThemeDialog.ui
-        ├── [Effects]
-            ├── EdgeDetector.py
-            ├── Equalizer.py
-            ├── Filter.py
-            ├── FreqFilters.py
-            ├── HoughTransform.py
-            ├── Hybrid.py
-            ├── Noise.py
-            ├── Normalize.py
-            ├── Snake.py
-            └── Thresholding.py
-        ├── [EffectsWidgets]
-            ├── EdgeDetectorGroupBox.py
-            ├── FilterGroupBox.py
-            ├── FreqFiltersGroupBox.py
-            ├── GrayscaleGroupbox.py
-            ├── HistogramGroupbox.py
-            ├── HoughTransformGroupBox.py
-            ├── HybridGroupBox.py
-            ├── NoiseGroupBox.py
-            ├── NormalizeGroupBox.py
-            ├── SnakeGroupBox.py
-            └── ThresholdingGroupBox.py
-        └── [ExtendedWidgets]
-            ├── CanvasWidget.py
-            ├── CustomFrame.py
-            ├── CustomTabWidget.py
-            ├── DoubleClickPushButton.py
-            ├── TableWithMovingRows.py
-            ├── TabWidget.py
-            └── ThemeDialog.py
-    HelperFunctions.py
-    ImageAlchemyBackend.py
-    ImageAlchemyUI.py
-    [Resources]
-        ├── 4-B4W5KT.jpg
-        ├── color.jpg
-        ├── grey.jpg
-        ├── [HoughSamples]
-            ├── [Circle]
-            ├── [Ellipse]
-            └── [Line]
-        ├── [Icons]
-        ├── images.jpeg
-        ├── snake_animation.gif
-        ├── snake_animation_02.gif
-        └── [Themes]
-            ├── BlackTheme.qss
-            ├── Stylesheet.qss
-            └── WhiteTheme.qss
+    [App]
+      ├── [Classes]
+          ├── [DialogTheme]
+              ├── ThemeDialog.py
+              └── ThemeDialog.ui
+          ├── [Effects]
+              ├── EdgeDetector.py
+              ├── Equalizer.py
+              ├── Filter.py
+              ├── FreqFilters.py
+              ├── HoughTransform.py
+              ├── Hybrid.py
+              ├── Noise.py
+              ├── Normalize.py
+              ├── Snake.py
+              └── Thresholding.py
+          ├── [EffectsWidgets]
+              ├── EdgeDetectorGroupBox.py
+              ├── FilterGroupBox.py
+              ├── FreqFiltersGroupBox.py
+              ├── GrayscaleGroupbox.py
+              ├── HistogramGroupbox.py
+              ├── HoughTransformGroupBox.py
+              ├── HybridGroupBox.py
+              ├── NoiseGroupBox.py
+              ├── NormalizeGroupBox.py
+              ├── SnakeGroupBox.py
+              └── ThresholdingGroupBox.py
+          └── [ExtendedWidgets]
+              ├── CanvasWidget.py
+              ├── CustomFrame.py
+              ├── CustomTabWidget.py
+              ├── DoubleClickPushButton.py
+              ├── TableWithMovingRows.py
+              ├── TabWidget.py
+              └── ThemeDialog.py
+      ├── HelperFunctions.py
+      ├── ImageAlchemyBackend.py
+      ├── ImageAlchemyUI.py
+      ├── [Resources]
+          ├── [HoughSamples]
+              ├── [Circle]
+              ├── [Ellipse]
+              └── [Line]
+          ├── [Icons]
+              ├── App_Icon.png
+              ├── clear.png
+              ├── close.png
+              ├── down-arrow.png
+              ├── [Effects]
+              ├── effects.png
+              ├── history.png
+              ├── LeftArrows.png
+              ├── RightArrows.png
+              ├── SliderHandle.png
+              ├── undo.png
+              ├── up-arrow.png
+              └── view.png
+          ├── [Other Image Resources]
+          └── [Themes]
+              ├── BlackTheme.qss
+              ├── Stylesheet.qss
+              └── WhiteTheme.qss
+  README.md
+  [README_resources]
+      ├── App_Flow.png
+      ├── App_UI.png
+      ├── Import__gif.gif
+      └── Thresholding.gif
+  requirements.txt
 
   </tr>
 </table>
