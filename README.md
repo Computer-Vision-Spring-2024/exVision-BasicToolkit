@@ -169,13 +169,13 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
               ├── BlackTheme.qss
               ├── Stylesheet.qss
               └── WhiteTheme.qss
-  README.md
-  [README_resources]
-      ├── App_Flow.png
-      ├── App_UI.png
-      ├── Import__gif.gif
-      └── Thresholding.gif
-  requirements.txt
+    README.md
+    [README_resources]
+        ├── App_Flow.png
+        ├── App_UI.png
+        ├── Import__gif.gif
+        └── Thresholding.gif
+    requirements.txt
 
   </tr>
 </table>
