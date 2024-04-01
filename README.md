@@ -8,10 +8,10 @@ ImageAlchemy - A PyQT5-based image processing application offering a variety of 
 - [Description](#description)
 - [Features](#features)
 - [Quick Preview](#quick-preview)
-- [User Interface Structure](#user_interface_structure)
+- [UI Structure](#ui-structure)
 - [Folder Structure](#folder-structure)
 - [Executing program](#executing-program)
-- [App Flow](#app_flow)
+- [App Flow: How to use the app?](#app-flow-how-to-use-the-app)
 - [Shortcuts](#shortcuts)
 - [Future Updates](#future-updates)
 - [Help](#help)
@@ -64,7 +64,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 
 ![Apply and adjust local and global threshold effect](README_resources/Thresholding.gif)</div>
 
-## User Interface Structure
+## UI Structure
 
 ![App Flow](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App_Flow.png)
 
@@ -207,7 +207,7 @@ pip install -r requirements.txt
 ```
 3. Run the file with the name "ImageAlchemyUI.py"
 
-## App Flow
+## App Flow: How to use the app?
 
 1. **Importing an Image**:
 
