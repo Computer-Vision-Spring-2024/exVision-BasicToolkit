@@ -27,6 +27,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (
     QFileDialog,
     QGroupBox,
@@ -263,6 +264,8 @@ class Backend:
             icon = self.effects_library[i]["icon"]
             button.setIcon(QtGui.QIcon(icon))
             button.setIconSize(QtCore.QSize(24, 24))
+            button.setToolTip(self.effects_library[i]["name"])
+            # button.setCursor(QCursor(Qt.PointingHandCursor))
             button.doubleClicked.connect(self.effects_library[i]["function"])
             self.ui.left_bar_collapsed_VLayout.addWidget(button)
 
