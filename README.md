@@ -85,7 +85,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 ## Folder Structure
 <table>
   <tr>
-    <td><p>
+    <td valign="top"><p>
 
 **_Classes_**
 - `DialogTheme`: This folder contains only the dialog class that appears to the user when he wants to change the appearance of the app.
@@ -161,19 +161,6 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
               ├── [Ellipse]
               └── [Line]
           ├── [Icons]
-              ├── App_Icon.png
-              ├── clear.png
-              ├── close.png
-              ├── down-arrow.png
-              ├── [Effects]
-              ├── effects.png
-              ├── history.png
-              ├── LeftArrows.png
-              ├── RightArrows.png
-              ├── SliderHandle.png
-              ├── undo.png
-              ├── up-arrow.png
-              └── view.png
           ├── [Other Image Resources]
           └── [Themes]
               ├── BlackTheme.qss
