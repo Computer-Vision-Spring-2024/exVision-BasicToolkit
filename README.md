@@ -70,7 +70,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 
 ## App Flow
 
-![App Flow](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App Flow.png)
+![App Flow](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App_Flow.png)
 
 ## Folder Structure
 <table>
