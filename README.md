@@ -34,7 +34,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
   <p> Upon applying multiple effects to an image, you can arrange the effects into a chain to get a cumulative pipeline that offers you the following: </p>
   
 - :heavy_check_mark: Visualise each effect on its own.
-- :heavy_check_mark: Delete a specific effect, whether you are in the mode of accumulation or not. If you are in this mode, the outputs of other effects of the chain will be recalculated.
+- :heavy_check_mark: Delete a specific effect, whether you are in the mode of accumulation or not. In case of that mode, the outputs of other effects of the chain will be recalculated.
 - :heavy_check_mark: Change the order of the effects to get a new cumulative output.
 
 :white_check_mark: **Digital Image Processing Techniques**
