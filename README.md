@@ -52,11 +52,19 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 ## Quick Preview
 
 #### Browse Images
-![Browse Images](README_resources/Import__gif.gif)
-#### Apply and adjust local and global threshold effect
-![Apply and adjust local and global threshold effect](README_resources/Thresholding.gif)
 
+<div align="center">
+
+![Browse Images](README_resources/Import__gif.gif)</div>
+
+
+#### Apply and adjust local and global threshold effect
+<div align="center">
+
+![Apply and adjust local and global threshold effect](README_resources/Thresholding.gif)</div>
 ## Shortcuts
+
+<div align="center">
 
 | Shortcut     | Functionality                                                        |
 |--------------|----------------------------------------------------------------------|
@@ -67,6 +75,8 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 | Ctrl+Q       | Exit the app                                                         |
 | Ctrl+C       | Show a guide on how to use the app (Currently unavailable)           |
 | Ctrl+H       | Open the documentation of the app (Currently unavailable)            |
+
+</div>
 
 ## App Flow
 
