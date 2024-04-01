@@ -1,7 +1,7 @@
 # ImageAlchemy
 ImageAlchemy - A PyQT5-based image processing application offering a variety of techniques implemented from scratch without external libraries.
 
-![App UI](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App_UI.png)
+![App UI](README_resources/App_UI.png)
 
 
 ## Table of Contents:
@@ -34,7 +34,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
   <p> Upon applying multiple effects to an image, you can arrange the effects into a chain to get a cumulative pipeline that offers you the following: </p>
   
 - :heavy_check_mark: Visualise each effect on its own.
-- :heavy_check_mark: Delete a specific effect, whether you are in the mode of accumulation or not. In case of that mode, the outputs of other effects of the chain will be recalculated.
+- :heavy_check_mark: Delete a specific effect, whether you are in the mode of accumulation or not. If you are in this mode, the outputs of other effects of the chain will be recalculated.
 - :heavy_check_mark: Change the order of the effects to get a new cumulative output.
 
 :white_check_mark: **Digital Image Processing Techniques**
@@ -66,7 +66,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 
 ## UI Structure
 
-![App Flow](https://github.com/Computer-Vision-Spring-2024/Task-2/blob/main/README_resources/App_Flow.png)
+![App Flow](README_resources/App_Flow.png)
 
 The provided image serves as a guide to understanding the various sections of our app's interface. Below, we'll delve into each section's functionality and elucidate how users can navigate and utilize the app effectively.
 
