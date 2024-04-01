@@ -113,7 +113,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 
 `HelperFunctions.py`: As the name suggests, this folder contains the functions that facilitate the application of different effects, especially the Equalizer.</p>
     </td>
-    <td>
+    <td valign="top">
 
     --- Folder Structure ---
     [App]
@@ -161,6 +161,7 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
               ├── [Ellipse]
               └── [Line]
           ├── [Icons]
+          ├── [ImagesLibrary]
           ├── [Other Image Resources]
           └── [Themes]
               ├── BlackTheme.qss
