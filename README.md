@@ -19,7 +19,7 @@ ImageAlchemy - A PyQT5-based image processing application offering a variety of 
 - [License](#license)
 
 ## Description
-ImageAlchemy is a comprehensive image processing application developed using PyQT5, providing a range of powerful techniques including grayscale conversion, noise addition, various filters, edge detection, thresholding, equalization, active contouring using Snake Algorithm, hybrid image creation, and Hough transformations. Remarkably, all functionalities are implemented from scratch, avoiding dependency on external libraries like OpenCV or Scikit-Image, ensuring a lightweight and self-contained solution for digital image processing needs.
+ImageAlchemy is a comprehensive image processing application developed using PyQT5, providing a range of powerful techniques including grayscale conversion, noise addition, various filters, edge and boundary detection, thresholding, equalization, active contouring using SNAKE Algorithm, and hybrid image creation. Remarkably, all functionalities are implemented from scratch, avoiding dependency on external libraries like OpenCV or Scikit-Image, ensuring a lightweight and self-contained solution for digital image processing needs.
 
 ## Features
 :white_check_mark: **3 Ways to add an image to the viewport**
