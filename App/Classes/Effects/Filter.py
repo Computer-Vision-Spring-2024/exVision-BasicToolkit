@@ -19,7 +19,6 @@ class Filter(QDoubleClickPushButton):
 
         # Attributes
         self.type = type
-        self.ahmed = "ahmed"
         # The spread or standard deviation of the Gaussian distribution
         self.sigma = sigma
         self.kernel_size = int(kernel_size)
@@ -79,7 +78,6 @@ class Filter(QDoubleClickPushButton):
 
     def calculate_filter(self):
         if self.type == "Mean":
-            print(self.ahmed)
             return self.mean_filter()
         elif self.type == "Median":
             return self.median_filter()

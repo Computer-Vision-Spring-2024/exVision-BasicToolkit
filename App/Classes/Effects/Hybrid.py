@@ -281,10 +281,10 @@ class HybridImages(QDoubleClickPushButton):
 
         elif not self.image2 is None:
             if self.hybrid_widget.radio_low_pass.isChecked():
-                image2 = self.apply_filter(self.image2, self.low_pass_cutoff_freq, 1)
+                image2 = self.apply_filter(self.image2, self.high_pass_cutoff_freq, 0)
                 self.frame2.Display_image(image2)
             else:
-                image2 = self.apply_filter(self.image2, self.high_pass_cutoff_freq, 0)
+                image2 = self.apply_filter(self.image2, self.low_pass_cutoff_freq, 1)
                 self.frame2.Display_image(image2)
 
     def update_lowpass(self):
