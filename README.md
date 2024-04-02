@@ -59,10 +59,30 @@ ImageAlchemy is a comprehensive image processing application developed using PyQ
 ![Browse Images](README_resources/Import__gif.gif)</div>
 
 
-#### Apply and adjust local and global threshold effect
+#### Apply and Adjust Local and Global Threshold Effect
 <div align="center">
 
 ![Apply and adjust local and global threshold effect](README_resources/Thresholding.gif)</div>
+
+#### Adjust Added Noise 
+<div align="center">
+
+![Adjust Added Noise](README_resources/noise.gif)</div>
+
+#### Navigate Through the Applied Effects Output
+<div align="center">
+
+![Navigate Through the Applied Effects Output](README_resources/Navigate.gif)</div>
+
+#### Perform Active Contouring
+<div align="center">
+
+![Perform Active Contouring](README_resources/snake.gif)</div>
+
+#### Reset
+<div align="center">
+
+![Reset](README_resources/reset.gif)</div>
 
 ## UI Structure
 
