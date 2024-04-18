@@ -79,10 +79,16 @@ class Filter(QDoubleClickPushButton):
     def calculate_filter(self):
         if self.type == "Mean":
             return self.mean_filter()
-        elif self.type == "Median":
-            return self.median_filter()
+        elif self.type == "Weighed Average":
+            return self.weighed_average_filter()
         elif self.type == "Gaussian":
             return self.gaussian_filter()
+        elif self.type == "Median":
+            return self.median_filter()
+        elif self.type == "Max":
+            return self.max_filter()
+        elif self.type == "Min":
+            return self.min_filter()
         else:
             raise ValueError("Unexpected filter type: " + self.type)
 
@@ -158,15 +164,8 @@ class Filter(QDoubleClickPushButton):
         """
         return self._apply_filter(np.mean)
 
-    def median_filter(self):
-        """
-        Description:
-            -   Applies a median filter to an image.
-
-        Returns:
-            -   [numpy ndarray]: A filtered image using a median filter.
-        """
-        return self._apply_filter(np.median)
+    def weighed_average_filter(self):
+        pass
 
     def gaussian_filter(self):
         """
@@ -192,3 +191,33 @@ class Filter(QDoubleClickPushButton):
                 gaussian_filtered_image[i, j] = np.sum(window * kernel)
 
         return gaussian_filtered_image
+
+    def median_filter(self):
+        """
+        Description:
+            -   Applies a median filter to an image.
+
+        Returns:
+            -   [numpy ndarray]: A filtered image using a median filter.
+        """
+        return self._apply_filter(np.median)
+
+    def max_filter(self):
+        """
+        Description:
+            - Applies a max filter to an image.
+
+        Returns:
+            - A numpy array representing the filtered image.
+        """
+        return self._apply_filter(np.max)
+
+    def min_filter(self):
+        """
+        Description:
+            - Applies a min filter to an image.
+
+        Returns:
+            - A numpy array representing the filtered image.
+        """
+        return self._apply_filter(np.min)

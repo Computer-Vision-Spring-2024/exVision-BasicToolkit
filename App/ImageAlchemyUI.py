@@ -48,6 +48,12 @@ class Ui_ImgProcessor(object):
         self.app_grid_layout.setSpacing(0)
         self.app_grid_layout.setObjectName("gridLayout")
 
+        # # Create the splitter to make the app resizable
+        # self.splitter = QtWidgets.QSplitter(self.centralwidget)
+        # self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        # self.splitter.setObjectName("splitter")
+        # self.app_grid_layout.addWidget(self.splitter, 0, 0, 1, 1)
+
         # Side Bar: Left Sidebar -> Closed by default #
         # =========================================== #
 
@@ -78,6 +84,18 @@ class Ui_ImgProcessor(object):
         self.left_bar_expanded = QtWidgets.QWidget(self.centralwidget)
         self.left_bar_expanded.setObjectName("left_bar_expanded")
         self.left_bar_expanded_VLayout = QtWidgets.QVBoxLayout(self.left_bar_expanded)
+        # # To add the feature of manual resizing
+        # self.left_bar_full = QtWidgets.QWidget()
+        # self.left_bar_full.setObjectName("left_bar_full")
+        # self.left_bar_full_VLayout = QtWidgets.QVBoxLayout(self.left_bar_full)
+        # self.left_bar_full_VLayout.setContentsMargins(0, 0, 0, 0)
+        # self.left_bar_full_VLayout.addWidget(self.left_bar_header)
+        # ## Make a horizontal layout that holds the views of the left bar and place it into the left bar full layout
+        # self.left_bar_views_HLayout = QtWidgets.QHBoxLayout()
+        # self.left_bar_views_HLayout.setContentsMargins(0, 0, 0, 0)
+        # self.left_bar_views_HLayout.addWidget(self.left_bar_collapsed)
+        # self.left_bar_views_HLayout.addWidget(self.left_bar_expanded)
+        # self.left_bar_full_VLayout.addLayout(self.left_bar_views_HLayout)
 
         # Viewport: Image Workspace #
         # ========================= #
@@ -156,6 +174,19 @@ class Ui_ImgProcessor(object):
         self.effect_menu_expanded_VLayout.setContentsMargins(0, 0, 0, 0)
         self.effect_menu_expanded.setMinimumWidth(200)
 
+        # # To add the feature of manual resizing
+        # self.effect_menu_full = QtWidgets.QWidget()
+        # self.effect_menu_full.setObjectName("effect_menu_full")
+        # self.effect_menu_full_VLayout = QtWidgets.QVBoxLayout(self.effect_menu_full)
+        # self.effect_menu_full_VLayout.addWidget(self.effect_menu_header)
+        # self.effect_menu_full_VLayout.setContentsMargins(0, 0, 0, 0)
+        # ## Make a horizontal layout that holds the views of the effect menu and place it into the effect menu full layout
+        # self.effect_menu_full_HLayout = QtWidgets.QHBoxLayout()
+        # self.effect_menu_full_HLayout.setContentsMargins(0, 0, 0, 0)
+        # self.effect_menu_full_HLayout.addWidget(self.effect_menu_collapsed)
+        # self.effect_menu_full_HLayout.addWidget(self.effect_menu_expanded)
+        # self.effect_menu_full_VLayout.addLayout(self.effect_menu_full_HLayout)
+
         # Effect Menu: Expanded View Content #
         # ================================== #
         # Create a scroll area
@@ -222,6 +253,18 @@ class Ui_ImgProcessor(object):
             self.control_panel_expanded
         )
         self.control_panel_expanded_VLayout.setContentsMargins(0, 0, 0, 0)
+        # # To add the feature of manual resizing
+        # self.control_panel_full = QtWidgets.QWidget()
+        # self.control_panel_full.setObjectName("control_panel_full")
+        # self.control_panel_full_VLayout = QtWidgets.QVBoxLayout(self.control_panel_full)
+        # self.control_panel_full_VLayout.addWidget(self.control_panel_header)
+        # self.control_panel_full_VLayout.setContentsMargins(0, 0, 0, 0)
+        # ## Make a horizontal layout that holds the views of the control panel and place it into the control panel full layout
+        # self.control_panel_full_HLayout = QtWidgets.QHBoxLayout()
+        # self.control_panel_full_HLayout.setContentsMargins(0, 0, 0, 0)
+        # self.control_panel_full_HLayout.addWidget(self.control_panel_collapsed)
+        # self.control_panel_full_HLayout.addWidget(self.control_panel_expanded)
+        # self.control_panel_full_VLayout.addLayout(self.control_panel_full_HLayout)
 
         # Control Panel Collapsed Content #
         # =============================== #
@@ -514,6 +557,8 @@ class Ui_ImgProcessor(object):
 
         # Manage of the app main layout #
         # ============================= #
+
+        # Before adding the resizability feature
         self.app_grid_layout.addWidget(self.left_bar_header, 0, 0, 1, 2)
         self.app_grid_layout.addWidget(self.left_bar_collapsed, 1, 0, 1, 1)
         self.app_grid_layout.addWidget(self.left_bar_expanded, 1, 1, 1, 1)
@@ -527,6 +572,15 @@ class Ui_ImgProcessor(object):
         self.app_grid_layout.addWidget(self.control_panel_header, 0, 5, 1, 2)
         self.app_grid_layout.addWidget(self.control_panel_collapsed, 1, 5, 1, 1)
         self.app_grid_layout.addWidget(self.control_panel_expanded, 1, 6, 1, 1)
+
+        # # Add widgets to splitter
+        # self.splitter.addWidget(self.left_bar_full)
+        # self.splitter.addWidget(self.image_workspace)
+        # self.splitter.addWidget(self.effect_menu_full)
+        # self.splitter.addWidget(self.control_panel_full)
+
+        # # Set sizes for the sections
+        # self.splitter.setSizes([200, 400, 200, 300])
 
         self.init_bars_signals_and_slots()
         self.retranslateUi(ImgAlchemy)

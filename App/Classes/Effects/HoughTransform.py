@@ -7,7 +7,7 @@ import numpy as np
 from Classes.EffectsWidgets.HoughTransformGroupBox import HoughTransformGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 from PyQt5.QtCore import pyqtSignal
-from skimage import color, img_as_ubyte
+from skimage import color, data, img_as_ubyte
 from skimage.draw import ellipse_perimeter
 from skimage.feature import canny
 from skimage.transform import hough_ellipse
@@ -307,10 +307,15 @@ class HoughTransform(QDoubleClickPushButton):
         return superimposed_circles_image
 
     def hough_ellipse_using_scikit_image(self):
-        image_gray = color.rgb2gray(self.original_image)
+        image_rgb = data.coffee()[0:220, 160:420]
+        image_gray = color.rgb2gray(image_rgb)
         edges = canny(image_gray, sigma=2.0, low_threshold=0.55, high_threshold=0.8)
+        # result = hough_ellipse(
+        #     edges, accuracy=20, threshold=250, min_size=100, max_size=120
+        # )
+
         result = hough_ellipse(
-            edges, accuracy=20, threshold=250, min_size=100, max_size=120
+            self.edged_image, accuracy=20, threshold=250, min_size=100, max_size=120
         )
         result.sort(order="accumulator")
 
@@ -387,22 +392,19 @@ class HoughTransform(QDoubleClickPushButton):
                         parameters = [x0, y0, a, si, alpha]
                         return parameters
 
-        print("No ellipses detected!")
         return None
 
     def ellipse_output_image_from_scratch(self):
 
-        img = cv2.Canny(self.original_image, 100, 200)
-
-        parameters = self.hough_ellipse_from_scratch(img)
+        parameters = self.hough_ellipse_from_scratch(self.edged_image)
         # Define the parameters of the ellipse
         center = (
             int(parameters[0]),
             int(parameters[1]),
         )  # Convert center coordinates to integers
         axes = (
-            int(parameters[2]) * 2,
-            parameters[3] * 2,
+            int(parameters[2]),
+            parameters[3],
         )  # Convert major axis length to integer
         angle = np.degrees(parameters[4])  # Convert angle from radians to degrees
 
@@ -411,8 +413,10 @@ class HoughTransform(QDoubleClickPushButton):
 
         # Draw the ellipse on the image
         self.output_image = cv2.ellipse(
-            image, center, axes, 255 - angle, 0, 360, (0, 255, 0), 2
+            image, center, axes, angle, 0, 360, (0, 255, 0), 2
         )
+
+        self.output_image[int(parameters[1]), int(parameters[0])] = 255
         return self.output_image
 
     # Line Transform Helper Functions

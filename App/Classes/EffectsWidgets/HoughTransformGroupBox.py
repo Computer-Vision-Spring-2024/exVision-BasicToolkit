@@ -134,7 +134,7 @@ class HoughTransformGroupBox(QGroupBox):
         self.ellipse_detector_type_label = QLabel("Detector Type")
         self.ellipse_detector_type_combobox = QComboBox()
         self.ellipse_detector_type_combobox.addItems(["From Scratch", "Scikit-image"])
-        self.ellipse_detector_type_combobox.setCurrentIndex(1)
+        self.ellipse_detector_type_combobox.setCurrentIndex(0)
         self.ellipse_attributes_hbox.addWidget(self.ellipse_detector_type_label)
         self.ellipse_attributes_hbox.addWidget(self.ellipse_detector_type_combobox)
 

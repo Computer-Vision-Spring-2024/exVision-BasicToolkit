@@ -46,10 +46,14 @@ class Image:
         self.img_data = None
         self.grayscale_img = None
 
-        self.output_img = None
-        self.cumulative_output = None
+        self.output_img = None  # The output image of the last appied effect
+        self.cumulative_output = (
+            None  # The output image of appliying all the effects as "chain"
+        )
 
-        self.applied_effects = {}  # Dictionary to store the applied effects.
+        self.applied_effects = (
+            {}
+        )  # Dictionary to store the applied effects and its parameters.
         # They will be shown in the tree and the table widgets.
         Image.all_images.append(self)
         # To facilitate the access to the images, we will store them in a list
@@ -83,6 +87,8 @@ class Image:
         Args:
             - effect_name [String]: Name of the effect, the key in the dictionary.
             - effect_attributes [Dictionary]: Attributes of the effect (e.g., type, value1, value2).
+
+        Note that these are formed inside each effect class and we are just passing it to the class to set/store it.
         """
         self.applied_effects[effect_name] = effect_attributes
 
@@ -183,6 +189,9 @@ class Backend:
             },
         ]
         ###  End  Effects Library ###
+
+        ## === Cumulative Boolean === ##
+        self.is_cumulative = False
 
         self.init_ui_connections()
 
@@ -1103,7 +1112,9 @@ class Backend:
             nonlocal edged_image
             edged_image = new_edged_image
             # Update the Hough Transform with the new edged image
-            hough_effect.update_images(self.current_image_data, self.grayscale_image, edged_image)
+            hough_effect.update_images(
+                self.current_image_data, self.grayscale_image, edged_image
+            )
             # Update the displayed image
             self.current_image.set_output_image(self.output_image)
             self.display_image(self.current_image_data, self.output_image)
@@ -1264,7 +1275,7 @@ class Backend:
         Description:
             - Toggles the cumulative pipeline of the applied effects.
         """
-        pass
+        self.is_cumulative = not self.is_cumulative
 
     # Added Effects table widget functionalities #
     # ========================================== #

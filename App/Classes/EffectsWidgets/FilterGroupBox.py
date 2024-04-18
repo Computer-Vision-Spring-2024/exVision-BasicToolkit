@@ -24,7 +24,9 @@ class FilterGroupBox(QGroupBox):
         filter_type_layout = QHBoxLayout()
         self.filter_type_label = QLabel("Filter Type")
         self.filter_type_comb = QComboBox()
-        self.filter_type_comb.addItems(["Mean", "Median", "Gaussian"])
+        self.filter_type_comb.addItems(
+            ["Mean", "Weighted Average", "Gaussian", "Median", "Max", "Min"]
+        )
         self.filter_type_comb.currentIndexChanged.connect(self.update_filter_options)
         filter_type_layout.addWidget(self.filter_type_label)
         filter_type_layout.addWidget(self.filter_type_comb)
@@ -55,8 +57,8 @@ class FilterGroupBox(QGroupBox):
 
     def update_filter_options(self, index):
         if index == 2:  # Gaussian
-            self.sigma_spinbox.setVisible(True)
             self.sigma_label.setVisible(True)
+            self.sigma_spinbox.setVisible(True)
         else:  # Mean or Median
-            self.sigma_spinbox.setVisible(False)
             self.sigma_label.setVisible(False)
+            self.sigma_spinbox.setVisible(False)
