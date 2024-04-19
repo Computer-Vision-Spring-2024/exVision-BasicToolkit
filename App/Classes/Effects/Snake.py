@@ -77,7 +77,7 @@ class Snake(QDoubleClickPushButton):
         self.code_lookup_image_space = {
             0 : list(range(339,361)) + list(range(0,23,1)), 
             7 : range(23,68), 
-            7 : range(68,113),  
+            6 : range(68,113),  
             5 : range(113,158), 
             4 : range(158,203), 
             3 : range(203, 248), 
