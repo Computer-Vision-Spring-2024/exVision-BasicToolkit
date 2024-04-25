@@ -27,7 +27,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QCursor, QIcon
 from PyQt5.QtWidgets import (
     QFileDialog,
     QGroupBox,
@@ -590,6 +590,7 @@ class Backend:
             - icon_type: Type of icon to be displayed (QMessageBox.Information, QMessageBox.Critical, etc.).
         """
         msg = QMessageBox()
+        msg.setIconPixmap(QIcon("icon.png").pixmap(64, 64))
         msg.setIcon(icon_type)
         msg.setWindowTitle(title)
         msg.setText(message)
@@ -606,6 +607,7 @@ class Backend:
             - path: The path of the image.
         """
         msgBox = QMessageBox()
+        msgBox.setIconPixmap(QIcon("icon.png").pixmap(64, 64))
         msgBox.setIcon(QMessageBox.Question)
         msgBox.setText("Select an Image")
         msgBox.setWindowTitle("Image Selection")

@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import qdarktheme
 from Classes.ExtendedWidgets.CustomTabWidget import CustomTabWidget
 from Classes.ExtendedWidgets.TableWithMovingRows import TableWidgetDragRows
+from Classes.ExtendedWidgets.UserGuide import UserGuideDialog
 from ImageAlchemyBackend import Backend
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -521,6 +522,7 @@ class Ui_ImgProcessor(object):
         self.actionControls = QtWidgets.QAction(ImgAlchemy)
         self.actionControls.setObjectName("actionControls")
         self.actionControls.setShortcut("Ctrl+C")
+        self.actionControls.triggered.connect(self.open_user_guide)
         # App Documentation
         self.actionApp_Documentation = QtWidgets.QAction(ImgAlchemy)
         self.actionApp_Documentation.setObjectName("actionApp_Documentation")
@@ -581,6 +583,9 @@ class Ui_ImgProcessor(object):
 
         # # Set sizes for the sections
         # self.splitter.setSizes([200, 400, 200, 300])
+
+        # Instantiate the user guide once #
+        # =============================== #
 
         self.init_bars_signals_and_slots()
         self.retranslateUi(ImgAlchemy)
@@ -672,6 +677,10 @@ class Ui_ImgProcessor(object):
             not self.control_panel_header_btn.isChecked()
         )
 
+    def open_user_guide(self):
+        user_guide = UserGuideDialog()
+        user_guide.exec_()
+
     def open_documentation(self):
         webbrowser.open("https://github.com/Computer-Vision-Spring-2024/Task-1")
 
@@ -702,7 +711,7 @@ class Ui_ImgProcessor(object):
             self.img_history_tab_widget.indexOf(self.img_history_tab),
             _translate("ImgProcessor", "Image History"),
         )
-        self.actionControls.setText(_translate("ImgProcessor", "Controls"))
+        self.actionControls.setText(_translate("ImgProcessor", "User Guide"))
         self.actionApp_Documentation.setText(
             _translate("ImgProcessor", "App Documentation")
         )
