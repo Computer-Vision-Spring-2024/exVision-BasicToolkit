@@ -1,0 +1,8 @@
+SIFT:
+----- SIFT Output
+
+Thresholding:
+----- Histogram Global Thresholds
+
+PCA:
+----- ROC

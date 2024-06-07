@@ -2,7 +2,6 @@ import os
 from collections import defaultdict
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 from Classes.Effects.EdgeDetector import EdgeDetector
 from Classes.Effects.Equalizer import Equalizer
@@ -16,7 +15,7 @@ from Classes.Effects.Snake import Snake
 from Classes.Effects.Thresholding import Thresholding
 from Classes.ExtendedWidgets.CanvasWidget import CanvasWidget
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-from App.Effect_Classes_and_Helpers.HelperFunctions import (
+from Classes.Helpers.HelperFunctions import (
     BGR2LAB,
     Histogram_computation,
     _3d_colored_or_not,
