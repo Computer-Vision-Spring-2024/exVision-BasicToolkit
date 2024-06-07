@@ -1,7 +1,13 @@
 import numpy as np
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-from HelperFunctions import Histogram_computation, cumulative_summation
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
+
+from App.Effect_Classes_and_Helpers.HelperFunctions import (
+    Histogram_computation,
+    cumulative_summation,
+)
 
 
 class Equalizer(QDoubleClickPushButton):
@@ -17,7 +23,6 @@ class Equalizer(QDoubleClickPushButton):
         self.image = imageData
 
     # Methods
-
 
     def General_Histogram_Equalization(self):
         """

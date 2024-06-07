@@ -13,7 +13,6 @@
 - Set minimum and maximum width for each section. || the resizing after adding a new tab.
 - Update the user guide: Add a tree of the effects. When an item is clicked, it show a gif and basic explanation of how to use it. (Controls Option)
 - Add a splitter to the UI so the four sections become resizable
-- Remove the Cumulative option and the table!
 
 ### Backend:
 
@@ -81,6 +80,7 @@
   - tick or untick the visibility of all added effects in the table widget.
 - Fix the orientation of the canvas titles [passed after reducing the white margin around the canvas]
 - Save the output image of the edge detector.
+- Remove the Cumulative option and the table!
 
 ### Digital Image Processing Functions:
 

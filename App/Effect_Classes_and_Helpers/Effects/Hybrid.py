@@ -1,9 +1,10 @@
 import numpy as np
+from Effect_Classes_and_Helpers.EffectsWidgets.HybridGroupBox import HybridGroupBox
+from Effect_Classes_and_Helpers.ExtendedWidgets.CustomFrame import CustomFrame
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
-
-from Classes.EffectsWidgets.HybridGroupBox import HybridGroupBox
-from Classes.ExtendedWidgets.CustomFrame import CustomFrame
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 
 
 class HybridImages(QDoubleClickPushButton):

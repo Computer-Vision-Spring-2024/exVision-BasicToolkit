@@ -4,8 +4,12 @@ from collections import defaultdict
 
 import cv2
 import numpy as np
-from Classes.EffectsWidgets.HoughTransformGroupBox import HoughTransformGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from Effect_Classes_and_Helpers.EffectsWidgets.HoughTransformGroupBox import (
+    HoughTransformGroupBox,
+)
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
 from skimage import color, data, img_as_ubyte
 from skimage.draw import ellipse_perimeter

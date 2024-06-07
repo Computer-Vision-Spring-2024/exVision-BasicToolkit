@@ -1,8 +1,12 @@
 import matplotlib.colors as mcolors
 import numpy as np
-from Classes.Effects.Filter import Filter
-from Classes.EffectsWidgets.EdgeDetectorGroupBox import EdgeDetectorGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from Effect_Classes_and_Helpers.Effects.Filter import Filter
+from Effect_Classes_and_Helpers.EffectsWidgets.EdgeDetectorGroupBox import (
+    EdgeDetectorGroupBox,
+)
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
 
 

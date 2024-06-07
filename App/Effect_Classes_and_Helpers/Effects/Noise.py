@@ -1,8 +1,9 @@
 import numpy as np
+from Effect_Classes_and_Helpers.EffectsWidgets.NoiseGroupBox import NoiseGroupBox
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
-
-from Classes.EffectsWidgets.NoiseGroupBox import NoiseGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 
 
 class Noise(QDoubleClickPushButton):
@@ -87,7 +88,6 @@ class Noise(QDoubleClickPushButton):
             return self.generate_gaussian_noise()
         elif self.type == "Salt & Pepper":
             return self.generate_salt_pepper_noise()
-
 
     def generate_uniform_noise(self):
         """

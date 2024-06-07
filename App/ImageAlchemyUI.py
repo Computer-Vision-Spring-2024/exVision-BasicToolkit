@@ -12,14 +12,12 @@ import matplotlib.pyplot as plt
 # in CMD: pip install qdarkstyle -> pip install pyqtdarktheme
 import qdarktheme
 from Classes.ExtendedWidgets.CustomTabWidget import CustomTabWidget
-from Classes.ExtendedWidgets.TableWithMovingRows import TableWidgetDragRows
 from Classes.ExtendedWidgets.UserGuide import UserGuideDialog
 from ImageAlchemyBackend import Backend
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCursor, QIcon
-from PyQt5.QtWidgets import QHeaderView
 
 
 class Ui_ImgProcessor(object):
@@ -48,12 +46,6 @@ class Ui_ImgProcessor(object):
         self.app_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.app_grid_layout.setSpacing(0)
         self.app_grid_layout.setObjectName("gridLayout")
-
-        # # Create the splitter to make the app resizable
-        # self.splitter = QtWidgets.QSplitter(self.centralwidget)
-        # self.splitter.setOrientation(QtCore.Qt.Horizontal)
-        # self.splitter.setObjectName("splitter")
-        # self.app_grid_layout.addWidget(self.splitter, 0, 0, 1, 1)
 
         # Side Bar: Left Sidebar -> Closed by default #
         # =========================================== #
@@ -85,18 +77,6 @@ class Ui_ImgProcessor(object):
         self.left_bar_expanded = QtWidgets.QWidget(self.centralwidget)
         self.left_bar_expanded.setObjectName("left_bar_expanded")
         self.left_bar_expanded_VLayout = QtWidgets.QVBoxLayout(self.left_bar_expanded)
-        # # To add the feature of manual resizing
-        # self.left_bar_full = QtWidgets.QWidget()
-        # self.left_bar_full.setObjectName("left_bar_full")
-        # self.left_bar_full_VLayout = QtWidgets.QVBoxLayout(self.left_bar_full)
-        # self.left_bar_full_VLayout.setContentsMargins(0, 0, 0, 0)
-        # self.left_bar_full_VLayout.addWidget(self.left_bar_header)
-        # ## Make a horizontal layout that holds the views of the left bar and place it into the left bar full layout
-        # self.left_bar_views_HLayout = QtWidgets.QHBoxLayout()
-        # self.left_bar_views_HLayout.setContentsMargins(0, 0, 0, 0)
-        # self.left_bar_views_HLayout.addWidget(self.left_bar_collapsed)
-        # self.left_bar_views_HLayout.addWidget(self.left_bar_expanded)
-        # self.left_bar_full_VLayout.addLayout(self.left_bar_views_HLayout)
 
         # Viewport: Image Workspace #
         # ========================= #
@@ -175,19 +155,6 @@ class Ui_ImgProcessor(object):
         self.effect_menu_expanded_VLayout.setContentsMargins(0, 0, 0, 0)
         self.effect_menu_expanded.setMinimumWidth(200)
 
-        # # To add the feature of manual resizing
-        # self.effect_menu_full = QtWidgets.QWidget()
-        # self.effect_menu_full.setObjectName("effect_menu_full")
-        # self.effect_menu_full_VLayout = QtWidgets.QVBoxLayout(self.effect_menu_full)
-        # self.effect_menu_full_VLayout.addWidget(self.effect_menu_header)
-        # self.effect_menu_full_VLayout.setContentsMargins(0, 0, 0, 0)
-        # ## Make a horizontal layout that holds the views of the effect menu and place it into the effect menu full layout
-        # self.effect_menu_full_HLayout = QtWidgets.QHBoxLayout()
-        # self.effect_menu_full_HLayout.setContentsMargins(0, 0, 0, 0)
-        # self.effect_menu_full_HLayout.addWidget(self.effect_menu_collapsed)
-        # self.effect_menu_full_HLayout.addWidget(self.effect_menu_expanded)
-        # self.effect_menu_full_VLayout.addLayout(self.effect_menu_full_HLayout)
-
         # Effect Menu: Expanded View Content #
         # ================================== #
         # Create a scroll area
@@ -254,18 +221,6 @@ class Ui_ImgProcessor(object):
             self.control_panel_expanded
         )
         self.control_panel_expanded_VLayout.setContentsMargins(0, 0, 0, 0)
-        # # To add the feature of manual resizing
-        # self.control_panel_full = QtWidgets.QWidget()
-        # self.control_panel_full.setObjectName("control_panel_full")
-        # self.control_panel_full_VLayout = QtWidgets.QVBoxLayout(self.control_panel_full)
-        # self.control_panel_full_VLayout.addWidget(self.control_panel_header)
-        # self.control_panel_full_VLayout.setContentsMargins(0, 0, 0, 0)
-        # ## Make a horizontal layout that holds the views of the control panel and place it into the control panel full layout
-        # self.control_panel_full_HLayout = QtWidgets.QHBoxLayout()
-        # self.control_panel_full_HLayout.setContentsMargins(0, 0, 0, 0)
-        # self.control_panel_full_HLayout.addWidget(self.control_panel_collapsed)
-        # self.control_panel_full_HLayout.addWidget(self.control_panel_expanded)
-        # self.control_panel_full_VLayout.addLayout(self.control_panel_full_HLayout)
 
         # Control Panel Collapsed Content #
         # =============================== #
@@ -293,73 +248,6 @@ class Ui_ImgProcessor(object):
 
         # Control Panel Expanded Content #
         # ============================== #
-
-        # Added Effects Tab Widget
-        self.added_effects_tab_widget = QtWidgets.QTabWidget(
-            self.control_panel_expanded
-        )
-        self.added_effects_tab_widget.setObjectName("added_effects_tab_widget")
-        self.added_effects_tab = QtWidgets.QWidget()
-        self.added_effects_tab.setObjectName("added_effects_tab")
-        self.added_effects_tab_widget.addTab(self.added_effects_tab, "")
-        self.added_effects_layout = QtWidgets.QVBoxLayout(self.added_effects_tab)
-        self.added_effects_layout.setObjectName("added_effects_layout")
-
-        # Tool Bar inside the added effects menu
-        self.added_effects_tool_bar = QtWidgets.QToolBar(self.added_effects_tab)
-        self.added_effects_tool_bar.setObjectName("added_effects_tool_bar")
-        self.added_effects_tool_bar.setMovable(False)
-        self.added_effects_tool_bar.setIconSize(QSize(18, 18))
-        self.added_effects_layout.addWidget(self.added_effects_tool_bar)
-
-        # clear all effects in tool bar
-        self.clear_all_effects = QtWidgets.QToolButton(self.added_effects_tab)
-        self.clear_all_effects.setObjectName("clear_effects")
-        self.clear_all_effects.setIcon(QIcon("Resources/Icons/undo.png"))
-        self.clear_all_effects.setToolTip(
-            "Reset current image.\nThis action cannot be undone!\nAll effects will get deleted."
-        )
-        self.clear_all_effects.setCursor(QCursor(Qt.PointingHandCursor))
-        self.added_effects_tool_bar.addWidget(self.clear_all_effects)
-
-        # uncheck all effects in tool bar
-        self.show_hide_all_effects = QtWidgets.QToolButton(self.added_effects_tab)
-        self.show_hide_all_effects.setObjectName("show_hide_all_effects")
-        self.show_hide_all_effects.setIcon(QIcon("Resources/Icons/view.png"))
-        self.show_hide_all_effects.setCheckable(True)
-        self.show_hide_all_effects.setToolTip("Show/Hide all added effects.")
-        self.show_hide_all_effects.setCursor(QCursor(Qt.PointingHandCursor))
-        self.added_effects_tool_bar.addWidget(self.show_hide_all_effects)
-
-        # Add a radio button: cumulative/non-cumulative effects
-        self.cumulative_radio_btn = QtWidgets.QRadioButton(self.added_effects_tab)
-        self.cumulative_radio_btn.setObjectName("cumulative_radio_button")
-        self.cumulative_radio_btn.setText("Cumulative Pipeline")
-        self.cumulative_radio_btn.setCursor(QCursor(Qt.PointingHandCursor))
-        self.added_effects_tool_bar.addWidget(self.cumulative_radio_btn)
-
-        # Added Effects TableWidget
-        self.added_effects_table = TableWidgetDragRows(self.added_effects_tab)
-        self.added_effects_table.setObjectName("added_effects_table")
-        self.added_effects_table.setColumnCount(3)
-        self.added_effects_layout.setContentsMargins(0, 0, 0, 0)
-        # Remove headers
-        self.added_effects_table.horizontalHeader().setVisible(False)
-        self.added_effects_table.verticalHeader().setVisible(False)
-        self.added_effects_table.setAlternatingRowColors(True)
-        # Set resize mode for the first column to stretch
-        self.added_effects_table.horizontalHeader().setSectionResizeMode(
-            0, QHeaderView.Stretch
-        )
-        # Set resize mode for second and third column to resize to contents
-        self.added_effects_table.horizontalHeader().setSectionResizeMode(
-            1, QHeaderView.ResizeToContents
-        )
-        self.added_effects_table.horizontalHeader().setSectionResizeMode(
-            2, QHeaderView.ResizeToContents
-        )
-
-        self.added_effects_layout.addWidget(self.added_effects_table)
 
         # Image History Tab Widget
         self.img_history_tab_widget = QtWidgets.QTabWidget(self.control_panel_expanded)
@@ -399,7 +287,6 @@ class Ui_ImgProcessor(object):
 
         # Add the image history and added effects section to the expanded view
         self.control_panel_expanded_VLayout.addWidget(self.img_history_tab_widget)
-        self.control_panel_expanded_VLayout.addWidget(self.added_effects_tab_widget)
 
         # MenuBar: File || View || Tools || Help #
         # ====================================== #
@@ -575,22 +462,12 @@ class Ui_ImgProcessor(object):
         self.app_grid_layout.addWidget(self.control_panel_collapsed, 1, 5, 1, 1)
         self.app_grid_layout.addWidget(self.control_panel_expanded, 1, 6, 1, 1)
 
-        # # Add widgets to splitter
-        # self.splitter.addWidget(self.left_bar_full)
-        # self.splitter.addWidget(self.image_workspace)
-        # self.splitter.addWidget(self.effect_menu_full)
-        # self.splitter.addWidget(self.control_panel_full)
-
-        # # Set sizes for the sections
-        # self.splitter.setSizes([200, 400, 200, 300])
-
         # Instantiate the user guide once #
         # =============================== #
 
         self.init_bars_signals_and_slots()
         self.retranslateUi(ImgAlchemy)
         self.image_workspace.setCurrentIndex(0)
-        self.added_effects_tab_widget.setCurrentIndex(0)
         self.img_history_tab_widget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(ImgAlchemy)
 
@@ -700,13 +577,6 @@ class Ui_ImgProcessor(object):
             _translate("ImgProcessor", "Standard Images Library")
         )
         self.menu_hough_samples.setTitle(_translate("ImgProcessor", "Hough Samples"))
-        self.cumulative_radio_btn.setText(
-            _translate("ImgProcessor", "Cumulative Pipeline")
-        )
-        self.added_effects_tab_widget.setTabText(
-            self.added_effects_tab_widget.indexOf(self.added_effects_tab),
-            _translate("ImgProcessor", "Added Effects"),
-        )
         self.img_history_tab_widget.setTabText(
             self.img_history_tab_widget.indexOf(self.img_history_tab),
             _translate("ImgProcessor", "Image History"),
@@ -741,13 +611,13 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    with open("Resources\Themes\BlackTheme.qss", "r") as f:
-        stylesheet = f.read()
-        app.setStyleSheet(stylesheet)
+    # with open("Resources\Themes\BlackTheme.qss", "r") as f:
+    #     stylesheet = f.read()
+    #     app.setStyleSheet(stylesheet)
     ImgProcessor = QtWidgets.QMainWindow()
     ui = Ui_ImgProcessor()
     ui.setupUi(ImgProcessor)
     backend = Backend(ui)
     ImgProcessor.show()
-    # qdarktheme.setup_theme("dark")
+    qdarktheme.setup_theme("dark")
     sys.exit(app.exec_())

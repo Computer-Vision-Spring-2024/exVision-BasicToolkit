@@ -1,6 +1,10 @@
 import numpy as np
-from Classes.EffectsWidgets.ThresholdingGroupBox import ThresholdingGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from Effect_Classes_and_Helpers.EffectsWidgets.ThresholdingGroupBox import (
+    ThresholdingGroupBox,
+)
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
 
 
@@ -21,7 +25,9 @@ class Thresholding(QDoubleClickPushButton):
         self.val01 = (
             val01  # this value will be either global threshold or local_block_size.
         )
-        self.grayscale_image = imageData  # The image that the threshold will be added to
+        self.grayscale_image = (
+            imageData  # The image that the threshold will be added to
+        )
         self.shape = self.grayscale_image.shape  # The shape of the image
         self.thresholded_image = self.calculate_threshold()
 

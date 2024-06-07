@@ -1,10 +1,15 @@
 import cv2
 import numpy as np
-from Classes.EffectsWidgets.NormalizeGroupBox import NormalizeGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-from HelperFunctions import mean_std_dev, min_max
+from Effect_Classes_and_Helpers.EffectsWidgets.NormalizeGroupBox import (
+    NormalizeGroupBox,
+)
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QDoubleSpinBox
+
+from App.Effect_Classes_and_Helpers.HelperFunctions import mean_std_dev, min_max
 
 
 class Normalizer(QDoubleClickPushButton):

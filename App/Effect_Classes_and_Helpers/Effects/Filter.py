@@ -1,6 +1,8 @@
 import numpy as np
-from Classes.EffectsWidgets.FilterGroupBox import FilterGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from Effect_Classes_and_Helpers.EffectsWidgets.FilterGroupBox import FilterGroupBox
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
 
 

@@ -1,6 +1,10 @@
 import numpy as np
-from Classes.EffectsWidgets.FreqFiltersGroupBox import FreqFiltersGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from Effect_Classes_and_Helpers.EffectsWidgets.FreqFiltersGroupBox import (
+    FreqFiltersGroupBox,
+)
+from Effect_Classes_and_Helpers.ExtendedWidgets.DoubleClickPushButton import (
+    QDoubleClickPushButton,
+)
 from PyQt5.QtCore import pyqtSignal
 
 

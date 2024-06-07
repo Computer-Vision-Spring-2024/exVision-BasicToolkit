@@ -16,25 +16,17 @@ from Classes.Effects.Snake import Snake
 from Classes.Effects.Thresholding import Thresholding
 from Classes.ExtendedWidgets.CanvasWidget import CanvasWidget
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-from HelperFunctions import (
+from App.Effect_Classes_and_Helpers.HelperFunctions import (
     BGR2LAB,
     Histogram_computation,
     _3d_colored_or_not,
     cumulative_summation,
     is_grayscale,
 )
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCursor, QIcon
-from PyQt5.QtWidgets import (
-    QFileDialog,
-    QGroupBox,
-    QMessageBox,
-    QPushButton,
-    QTableWidgetItem,
-)
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QFileDialog, QGroupBox, QMessageBox
 
 
 class Image:
@@ -54,7 +46,7 @@ class Image:
         self.applied_effects = (
             {}
         )  # Dictionary to store the applied effects and its parameters.
-        # They will be shown in the tree and the table widgets.
+        # They will be shown in the tree.
         Image.all_images.append(self)
         # To facilitate the access to the images, we will store them in a list
         # and they will be shown in the tree widget.
@@ -82,7 +74,7 @@ class Image:
         """
         Description:
             - Store the effects that were applied on the image in a dictionary
-                to be shown in the tree and the table widgets.
+                to be shown in the tree widget.
 
         Args:
             - effect_name [String]: Name of the effect, the key in the dictionary.
@@ -309,17 +301,8 @@ class Backend:
         ## === Initialize a counter to keep track of the number of hybrid images created === ##
         self.hybrid_img_counter = 0
 
-        ## === Reset Current Image === ##
-        self.ui.clear_all_effects.clicked.connect(self.reset_image)
-
-        ## === Show/Hide all Effects === ##
-        self.ui.show_hide_all_effects.clicked.connect(self.show_hide_all_effects)
-
         ## === Clear Image History: Initially Disabled === ##
         self.ui.clear_history_btn.clicked.connect(self.clear_history)
-
-        ## === Cumulative Pipeline === ##
-        self.ui.cumulative_radio_btn.toggled.connect(self.cumulative_pipeline)
 
         ## === File Menu: Save Actions: Initially Disabled === ##
         self.ui.actionSave_current.triggered.connect(self.save_image)
@@ -573,10 +556,7 @@ class Backend:
         self.ui.actionSave_current.setEnabled(state)
         self.ui.actionSave_as.setEnabled(state)
         self.ui.actionSave_all.setEnabled(state)
-        self.ui.show_hide_all_effects.setEnabled(state)
-        self.ui.clear_all_effects.setEnabled(state)
         self.ui.clear_history_btn.setEnabled(state)
-        self.ui.cumulative_radio_btn.setEnabled(state)
 
     @staticmethod
     def show_message(title, message, icon_type):
@@ -720,7 +700,6 @@ class Backend:
 
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     def filter_image(self):
@@ -753,7 +732,6 @@ class Backend:
 
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     def detect_edges(self):
@@ -785,7 +763,6 @@ class Backend:
 
         # self.current_image.set_output_image(self.output_image) #  i guess, you don't have to store it as you won't use it further. it's not like the noisy or filtered image on which you will keep processing
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     def equalizer(self):
@@ -813,7 +790,6 @@ class Backend:
         # Repeated parts
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     def plot_equlaizer_histograms(self, channel: np.ndarray, color: bool):
@@ -888,7 +864,6 @@ class Backend:
 
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     def plot_histogram_and_CDF_in_new_tab(self):
@@ -992,7 +967,6 @@ class Backend:
 
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     def frequency_domain_filters(self):
@@ -1022,7 +996,6 @@ class Backend:
         self.current_image.add_applied_effect(freq_effect.title, freq_effect.attributes)
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     def hybrid_images(self):
@@ -1106,7 +1079,6 @@ class Backend:
         self.ui.scroll_area_VLayout.insertWidget(0, snake.snake_groupbox)
         self.current_image.add_applied_effect(snake.title, snake.attributes)
         self.update_tree()
-        self.update_table()
 
     def hough(self):
         # Define a function to update the edged image
@@ -1162,7 +1134,6 @@ class Backend:
         )
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
-        self.update_table()
         self.display_image(self.current_image_data, self.output_image)
 
     # ======================== Control Panel Functionalities =========================== #
@@ -1238,10 +1209,6 @@ class Backend:
         self.hybrid_img_counter = 0
         # Clear the tree
         self.update_tree()
-        # Clear the table of effects
-        num_rows = self.ui.added_effects_table.rowCount()
-        for i in range(num_rows):
-            self.ui.added_effects_table.removeRow(0)
 
         # Remove all applied effects group boxes in the right side panel
         for i in reversed(range(self.ui.scroll_area_VLayout.count())):
@@ -1261,7 +1228,7 @@ class Backend:
         """
         self.current_image.applied_effects.clear()
         self.update_tree()
-        self.update_table()
+
         self.output_image = self.current_image_data
         self.display_image(self.current_image_data, self.output_image)
 
@@ -1278,59 +1245,6 @@ class Backend:
             - Toggles the cumulative pipeline of the applied effects.
         """
         self.is_cumulative = not self.is_cumulative
-
-    # Added Effects table widget functionalities #
-    # ========================================== #
-    def update_table(self):
-        """
-        Description:
-            - Adds the applied effect of the current image to the table widget.
-
-        Args:
-            - effect_name: The name of the effect to be added.
-        """
-        # Clear the table of effects
-        num_rows = self.ui.added_effects_table.rowCount()
-        for i in range(num_rows):
-            self.ui.added_effects_table.removeRow(0)
-
-        for effect_name in self.current_image.applied_effects.keys():
-            row_position = self.ui.added_effects_table.rowCount()
-            self.ui.added_effects_table.insertRow(row_position)
-
-            # Fill the rows
-            self.ui.added_effects_table.setItem(
-                row_position, 0, QTableWidgetItem(effect_name)
-            )
-
-            # Add eye button
-            eye_button = QPushButton()
-            eye_button.setIcon(QtGui.QIcon("Resources/Icons/view.png"))
-            eye_button.clicked.connect(self.toggle_effect_visibility)
-            self.ui.added_effects_table.setCellWidget(row_position, 1, eye_button)
-
-            # Add trash button
-            trash_button = QPushButton()
-            trash_button.setIcon(QtGui.QIcon("Resources/Icons/clear.png"))
-            trash_button.clicked.connect(self.delete_effect)
-            self.ui.added_effects_table.setCellWidget(row_position, 2, trash_button)
-
-            # Set custom alternating row colors
-            for row in range(self.ui.added_effects_table.rowCount()):
-                if row % 2 == 0:
-                    self.ui.added_effects_table.item(row, 0).setBackground(
-                        QtGui.QColor(56, 56, 56)
-                    )
-                else:
-                    self.ui.added_effects_table.item(row, 0).setBackground(
-                        QtGui.QColor(71, 71, 71)
-                    )
-
-    def delete_effect(self):
-        print("deleted")
-
-    def toggle_effect_visibility(self):
-        print("toggled")
 
     # ==================== Added Effects Sidebar Functionalities ======================= #
 
