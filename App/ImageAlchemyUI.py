@@ -741,13 +741,13 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    # with open("Resources\Themes\BlackTheme.qss", "r") as f:
-    #     stylesheet = f.read()
-    #     app.setStyleSheet(stylesheet)
+    with open("Resources\Themes\BlackTheme.qss", "r") as f:
+        stylesheet = f.read()
+        app.setStyleSheet(stylesheet)
     ImgProcessor = QtWidgets.QMainWindow()
     ui = Ui_ImgProcessor()
     ui.setupUi(ImgProcessor)
     backend = Backend(ui)
     ImgProcessor.show()
-    qdarktheme.setup_theme("dark")
+    # qdarktheme.setup_theme("dark")
     sys.exit(app.exec_())
