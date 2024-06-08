@@ -12,11 +12,11 @@ from PyQt5.QtWidgets import (
 )
 
 
-class Thresholding02GroupBox(QGroupBox):
+class AdvancedThresholdingGroupBox(QGroupBox):
     def __init__(self, title):
         super().__init__(title)
         self.title = title
-        self.segmentation_effect = None
+        self.advanced_thresholding_effect = None
 
         self.initUI()
 

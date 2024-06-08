@@ -12,7 +12,7 @@ class FaceDetectionGroupBox(QGroupBox):
     def __init__(self, title):
         super().__init__(title)
         self.title = title
-        self.segmentation_effect = None
+        self.face_detection_effect = None
 
         self.initUI()
 

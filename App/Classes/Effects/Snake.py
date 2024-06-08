@@ -8,17 +8,17 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QFileDialog
 
 
-class Snake(QDoubleClickPushButton):
+class SNAKE(QDoubleClickPushButton):
     _instance_counter = 0
     attributes_updated = pyqtSignal(np.ndarray)
 
     def __init__(
         self, img_data, grayimageData, grayscale_flag, ui, parent=None, *args, **kwargs
     ):
-        super(Snake, self).__init__(parent)
+        super(SNAKE, self).__init__(parent)
         # For naming the instances of the effect
-        Snake._instance_counter += 1
-        self.title = f"Snake.{Snake._instance_counter:03d}"
+        SNAKE._instance_counter += 1
+        self.title = f"SNAKE.{SNAKE._instance_counter:03d}"
         self.setText(self.title)  # Set the text of the button to its title
         self.ui = ui
         self.ui.main_viewport_figure_canvas.mpl_connect(

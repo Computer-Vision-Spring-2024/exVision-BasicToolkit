@@ -3,15 +3,20 @@ from collections import defaultdict
 
 import cv2
 import numpy as np
+from Classes.Effects.CornerDetection import CornerDetection
 from Classes.Effects.EdgeDetector import EdgeDetector
 from Classes.Effects.Equalizer import Equalizer
+from Classes.Effects.FaceDetection import FaceDetection
+from Classes.Effects.FaceRecognition import FaceRecognitionGroupBox
 from Classes.Effects.Filter import Filter
 from Classes.Effects.FreqFilters import FreqFilters
 from Classes.Effects.HoughTransform import HoughTransform
 from Classes.Effects.Hybrid import HybridImages
 from Classes.Effects.Noise import Noise
 from Classes.Effects.Normalize import Normalizer
-from Classes.Effects.Snake import Snake
+from Classes.Effects.Segmentation import Segmentation
+from Classes.Effects.SIFT import SIFT
+from Classes.Effects.SNAKE import SNAKE
 from Classes.Effects.Thresholding import Thresholding
 from Classes.ExtendedWidgets.CanvasWidget import CanvasWidget
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
@@ -26,6 +31,8 @@ from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog, QGroupBox, QMessageBox
+
+from Classes.Effects.AdvancedThresholding import AdvancedThresholding
 
 
 class Image:
@@ -178,11 +185,38 @@ class Backend:
                 "icon": "Resources/Icons/Effects/hough.png",
                 "function": self.hough,
             },
+            {
+                "name": "Corner Detection",
+                "icon": "Resources/Icons/Effects/corner-detection.png",
+                "function": self.corner_detection,
+            },
+            {
+                "name": "SIFT",
+                "icon": "Resources/Icons/Effects/sift.png",
+                "function": self.sift,
+            },
+            {
+                "name": "Advanced Thresholding",
+                "icon": "Resources/Icons/Effects/thresholding02.png",
+                "function": self.thresholding,
+            },
+            {
+                "name": "Segmentation",
+                "icon": "Resources/Icons/Effects/segmentation.png",
+                "function": self.segmentation,
+            },
+            {
+                "name": "Face Recognition",
+                "icon": "Resources/Icons/Effects/face_recognition.png",
+                "function": self.face_recognition,
+            },
+            {
+                "name": "Face Detection",
+                "icon": "Resources/Icons/Effects/face_detection.png",
+                "function": self.face_detection,
+            },
         ]
         ###  End  Effects Library ###
-
-        ## === Cumulative Boolean === ##
-        self.is_cumulative = False
 
         self.init_ui_connections()
 
@@ -300,6 +334,9 @@ class Backend:
         ## === Initialize a counter to keep track of the number of hybrid images created === ##
         self.hybrid_img_counter = 0
 
+        ## === Detection Image Path === ##
+        self.detection_img_path = None
+
         ## === Clear Image History: Initially Disabled === ##
         self.ui.clear_history_btn.clicked.connect(self.clear_history)
 
@@ -348,6 +385,8 @@ class Backend:
                     QMessageBox.Critical,
                 )
                 return
+
+            self.detection_img_path = file_path
 
             # Instantiate an image object,that will be helpful to easily access the image data
             img = Image(file_path)
@@ -491,7 +530,7 @@ class Backend:
         # Expand the scroll area to sea the group box
         self.ui.toggle_effect_bar(True)
 
-    def display_image(self, input_img, output_img):
+    def display_image(self, input_img, output_img, grey="gray", axis_disabled="off"):
         """
         Description:
             - Displays an image in the main canvas.
@@ -517,11 +556,11 @@ class Backend:
             ax2 = self.ui.main_viewport_figure_canvas.figure.add_subplot(122)
 
         ax1.imshow(input_img, cmap="gray")
-        ax1.axis("off")
+        ax1.axis(axis_disabled)
         ax1.set_title("Input Image", color="white")
 
-        ax2.imshow(output_img, cmap="gray")
-        ax2.axis("off")
+        ax2.imshow(output_img, cmap=grey)
+        ax2.axis(axis_disabled)
         ax2.set_title("Output Image", color="white")
 
         # Reduce the white margins
@@ -1068,7 +1107,7 @@ class Backend:
             grayscale_image = self.grayscale_image
             display_grayscale_output_flag = 1
 
-        snake = Snake(
+        snake = SNAKE(
             self.current_image_data,
             grayscale_image,
             display_grayscale_output_flag,
@@ -1131,6 +1170,75 @@ class Backend:
         self.current_image.add_applied_effect(
             hough_effect.title, hough_effect.attributes
         )
+        self.current_image.set_output_image(self.output_image)
+        self.update_tree()
+        self.display_image(self.current_image_data, self.output_image)
+
+    def corner_detection(self):
+        """
+        Description:
+            -   Makes an instance of the corner detection effect class
+                and adds it to the current image.
+        """
+        if self.current_image_data is None:
+            self.show_message(
+                "Error", "Please load an image first.", QMessageBox.Critical
+            )
+            return
+
+        corner_detection_effect = CornerDetection(self.current_image_data)
+
+        # Corner Detection Effect Signal
+        corner_detection_effect.attributes_updated.connect(self.update_output_image)
+
+        # Get the output image after applying the noise
+        self.output_image = corner_detection_effect.output_image
+
+        # UI Changes and Setters
+        self.ui.scroll_area_VLayout.insertWidget(
+            0, corner_detection_effect.corner_detection_group_box
+        )
+        self.current_image.add_applied_effect(
+            corner_detection_effect.title, corner_detection_effect.attributes
+        )
+
+        self.current_image.set_output_image(self.output_image)
+        self.update_tree()
+        self.display_image(self.current_image_data, self.output_image)
+
+    def sift(self):
+        pass
+
+    def thresholding(self):
+        pass
+
+    def segmentation(self):
+        pass
+
+    def face_recognition(self):
+        pass
+
+    def face_detection(self):
+        if self.current_image_data is None:
+            self.show_message(
+                "Error", "Please load an image first.", QMessageBox.Critical
+            )
+            return
+
+        face_detection_effect = FaceDetection(self.detection_img_path)
+
+        # FaceDetection Effect Signal
+        face_detection_effect.attributes_updated.connect(self.update_output_image)
+
+        # Get the output image after applying the noise
+        self.current_image_data = face_detection_effect.detection_original_float
+        self.output_image = face_detection_effect.detection_output_image
+
+        # UI Changes and Setters
+        self.ui.scroll_area_VLayout.insertWidget(
+            0, face_detection_effect.face_detection_groupbox
+        )
+
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
         self.display_image(self.current_image_data, self.output_image)
@@ -1217,33 +1325,6 @@ class Backend:
 
         # disable all actions since we have no images
         self.enable_disable_actions(False)
-
-    # ToolBar of the Added Effects tab widget #
-    # ======================================= #
-    def reset_image(self):
-        """
-        Description:
-            - Resets the current image to its original state.
-        """
-        self.current_image.applied_effects.clear()
-        self.update_tree()
-
-        self.output_image = self.current_image_data
-        self.display_image(self.current_image_data, self.output_image)
-
-    def show_hide_all_effects(self):
-        """
-        Description:
-            - Shows or hides all the applied effects on the current image.
-        """
-        pass
-
-    def cumulative_pipeline(self):
-        """
-        Description:
-            - Toggles the cumulative pipeline of the applied effects.
-        """
-        self.is_cumulative = not self.is_cumulative
 
     # ==================== Added Effects Sidebar Functionalities ======================= #
 

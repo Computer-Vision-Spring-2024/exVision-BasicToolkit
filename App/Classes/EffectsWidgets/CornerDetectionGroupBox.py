@@ -6,7 +6,7 @@ class CornerDetectionGroupBox(QGroupBox):
     def __init__(self, title):
         super().__init__(title)
         self.title = title
-        self.segmentation_effect = None
+        self.corner_detection_effect = None
 
         self.initUI()
 
@@ -14,17 +14,13 @@ class CornerDetectionGroupBox(QGroupBox):
         self.main_layout = QVBoxLayout()
 
         # Threshold
-        self.corner_detection_threshold_label = QLabel()
-        self.corner_detection_threshold_label.setObjectName(
-            "corner_detection_threshold_label"
-        )
-        self.corner_detection_threshold_label.setText("Threshold")
+        self.threshold_label = QLabel()
+        self.threshold_label.setObjectName("corner_detection_threshold_label")
+        self.threshold_label.setText("Threshold: ")
 
-        self.corner_detection_threshold_slider = QSlider()
-        self.corner_detection_threshold_slider.setOrientation(Qt.Horizontal)
-        self.corner_detection_threshold_slider.setObjectName(
-            "corner_detection_threshold_slider"
-        )
+        self.threshold_slider = QSlider()
+        self.threshold_slider.setOrientation(Qt.Horizontal)
+        self.threshold_slider.setObjectName("corner_detection_threshold_slider")
 
         # Elapsed Time
         self.elapsed_time_label = QLabel()
@@ -42,8 +38,8 @@ class CornerDetectionGroupBox(QGroupBox):
         self.apply_lambda_minus.setText("Apply Lambda Minus")
 
         # Add Widgets to Layout: Region Growing
-        self.main_layout.addWidget(self.corner_detection_threshold_label)
-        self.main_layout.addWidget(self.corner_detection_threshold_slider)
+        self.main_layout.addWidget(self.threshold_label)
+        self.main_layout.addWidget(self.threshold_slider)
         self.main_layout.addWidget(self.elapsed_time_label)
         self.main_layout.addWidget(self.apply_harris)
         self.main_layout.addWidget(self.apply_lambda_minus)

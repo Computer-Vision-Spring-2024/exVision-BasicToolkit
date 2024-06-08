@@ -350,35 +350,79 @@ class SegmentationGroupBox(QGroupBox):
         self.apply_mean_shift.setObjectName("apply_mean_shift")
         self.apply_mean_shift.setText("Apply Mean Shift")
 
-        # Add Widgets to Main Layout: Region Growing
-        self.main_layout.addLayout(self.rg_threshold_HBoxLayout)
-        self.main_layout.addLayout(self.rg_window_size_HBoxLayout)
-        self.main_layout.addWidget(self.apply_region_growing)
-        self.main_layout.addWidget(self.reset_region_growing)
+        # Create a GroupBox and add Region Growing things inside it
+        self.rg_groupbox = QGroupBox()
+        self.rg_groupbox.setTitle("Region Growing")
+        self.rg_groupbox.setObjectName("region_growing")
+        self.rg_groupbox_VBoxLayout = QVBoxLayout()
+        self.rg_groupbox_VBoxLayout.setObjectName("rg_groupbox_VBoxLayout")
+        self.rg_groupbox.setLayout(self.rg_groupbox_VBoxLayout)
+        self.rg_groupbox_VBoxLayout.addLayout(self.rg_threshold_HBoxLayout)
+        self.rg_groupbox_VBoxLayout.addLayout(self.rg_window_size_HBoxLayout)
+        self.rg_groupbox_VBoxLayout.addWidget(self.apply_region_growing)
+        self.rg_groupbox_VBoxLayout.addWidget(self.reset_region_growing)
 
-        # Add Widgets to Main Layout: Agglomerative Clustering
-        self.main_layout.addLayout(self.num_of_clusters_HBoxLayout)
-        self.main_layout.addLayout(self.initial_num_of_clusters_HBoxLayout)
-        self.main_layout.addLayout(self.distance_calculation_method_VBoxLayout)
-        self.main_layout.addWidget(self.downsampling_checkbox)
-        self.main_layout.addLayout(self.scale_factor_HBoxLayout)
-        self.main_layout.addWidget(self.apply_segmentation)
-        self.main_layout.addWidget(self.elapsed_time_agglomerative)
+        # Create a GroupBox and add Agglomerative Clustering things inside it
+        self.agglo_groupbox = QGroupBox()
+        self.agglo_groupbox.setTitle("Agglomerative Clustering")
+        self.agglo_groupbox.setObjectName("agglomerative_clustering")
+        self.agglo_groupbox_VBoxLayout = QVBoxLayout()
+        self.agglo_groupbox_VBoxLayout.setObjectName("agglo_groupbox_VBoxLayout")
+        self.agglo_groupbox.setLayout(self.agglo_groupbox_VBoxLayout)
+        self.agglo_groupbox_VBoxLayout.addLayout(self.num_of_clusters_HBoxLayout)
+        self.agglo_groupbox_VBoxLayout.addLayout(
+            self.initial_num_of_clusters_HBoxLayout
+        )
+        self.agglo_groupbox_VBoxLayout.addLayout(
+            self.distance_calculation_method_VBoxLayout
+        )
+        self.agglo_groupbox_VBoxLayout.addWidget(self.downsampling_checkbox)
+        self.agglo_groupbox_VBoxLayout.addLayout(self.scale_factor_HBoxLayout)
+        self.agglo_groupbox_VBoxLayout.addWidget(self.apply_segmentation)
+        self.agglo_groupbox_VBoxLayout.addWidget(self.elapsed_time_agglomerative)
 
-        # Add Widgets to Main Layout: K-Means
-        self.main_layout.addLayout(self.n_clusters_HBoxLayout)
-        self.main_layout.addLayout(self.k_means_max_iterations_HBoxLayout)
-        self.main_layout.addWidget(self.spatial_segmentation)
-        self.main_layout.addLayout(self.spatial_segmentation_weight_HBoxLayout)
-        self.main_layout.addWidget(self.centroid_optimization)
-        self.main_layout.addWidget(self.k_means_LUV_conversion)
-        self.main_layout.addWidget(self.apply_k_means)
+        # Create a GroupBox and add K-Means things inside it
+        self.k_means_groupbox = QGroupBox()
+        self.k_means_groupbox.setTitle("K-Means")
+        self.k_means_groupbox.setObjectName("k_means_groupbox")
+        self.k_means_groupbox_VBoxLayout = QVBoxLayout()
+        self.k_means_groupbox_VBoxLayout.setObjectName("k_means_groupbox_VBoxLayout")
+        self.k_means_groupbox.setLayout(self.k_means_groupbox_VBoxLayout)
+        self.k_means_groupbox_VBoxLayout.addLayout(self.n_clusters_HBoxLayout)
+        self.k_means_groupbox_VBoxLayout.addLayout(
+            self.k_means_max_iterations_HBoxLayout
+        )
+        self.k_means_groupbox_VBoxLayout.addWidget(self.spatial_segmentation)
+        self.k_means_groupbox_VBoxLayout.addLayout(
+            self.spatial_segmentation_weight_HBoxLayout
+        )
+        self.k_means_groupbox_VBoxLayout.addWidget(self.centroid_optimization)
+        self.k_means_groupbox_VBoxLayout.addWidget(self.k_means_LUV_conversion)
+        self.k_means_groupbox_VBoxLayout.addWidget(self.apply_k_means)
 
-        # Add Widgets to Main Layout: Mean Shift
-        self.main_layout.addLayout(self.mean_shift_window_size_HBoxLayout)
-        self.main_layout.addLayout(self.mean_shift_sigma_HBoxLayout)
-        self.main_layout.addLayout(self.mean_shift_threshold_HBoxLayout)
-        self.main_layout.addWidget(self.mean_shift_LUV_conversion)
-        self.main_layout.addWidget(self.apply_mean_shift)
+        # Create a GroupBox and add Mean Shift things inside it
+        self.mean_shift_groupbox = QGroupBox()
+        self.mean_shift_groupbox.setTitle("Mean Shift")
+        self.mean_shift_groupbox.setObjectName("mean_shift_groupbox")
+        self.mean_shift_groupbox_VBoxLayout = QVBoxLayout()
+        self.mean_shift_groupbox_VBoxLayout.setObjectName(
+            "mean_shift_groupbox_VBoxLayout"
+        )
+        self.mean_shift_groupbox.setLayout(self.mean_shift_groupbox_VBoxLayout)
+        self.mean_shift_groupbox_VBoxLayout.addLayout(
+            self.mean_shift_window_size_HBoxLayout
+        )
+        self.mean_shift_groupbox_VBoxLayout.addLayout(self.mean_shift_sigma_HBoxLayout)
+        self.mean_shift_groupbox_VBoxLayout.addLayout(
+            self.mean_shift_threshold_HBoxLayout
+        )
+        self.mean_shift_groupbox_VBoxLayout.addWidget(self.mean_shift_LUV_conversion)
+        self.mean_shift_groupbox_VBoxLayout.addWidget(self.apply_mean_shift)
+
+        # Add GroupBoxes to the main layout
+        self.main_layout.addWidget(self.rg_groupbox)
+        self.main_layout.addWidget(self.agglo_groupbox)
+        self.main_layout.addWidget(self.k_means_groupbox)
+        self.main_layout.addWidget(self.mean_shift_groupbox)
 
         self.setLayout(self.main_layout)
