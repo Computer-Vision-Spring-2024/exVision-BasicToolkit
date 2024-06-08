@@ -474,19 +474,17 @@ def Normalized_histogram_computation(Image):
     # Get the dimensions of the image
     Image_Height = Image.shape[0]
     Image_Width = Image.shape[1]
-
     # Initialize the histogram array with zeros. The array has 256 element, each corresponding to a pixel intensity value (0 to 255)
     Histogram = np.zeros([256])
-
+    print(Histogram.shape)
     # Compute the histogram for each pixel in each channel
     for x in range(0, Image_Height):
         for y in range(0, Image_Width):
             # Increment the count of pixels in the histogram for the same pixel intensity at position (x, y) in the image.
             # This operation updates the histogram to track the number of pixels with a specific intensity value.
-            Histogram[Image[x, y]] += 1
+            Histogram[int(Image[x, y])] = Histogram[int(Image[x, y])] + 1
     # Normalize the histogram by dividing each bin count by the total number of pixels in the image
     Histogram /= Image_Height * Image_Width
-
     return Histogram
 
 

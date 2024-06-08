@@ -16,7 +16,7 @@ from Classes.Effects.Noise import Noise
 from Classes.Effects.Normalize import Normalizer
 from Classes.Effects.Segmentation import Segmentation
 from Classes.Effects.SIFT import SIFT
-from Classes.Effects.SNAKE import SNAKE
+from Classes.Effects.Snake import SNAKE
 from Classes.Effects.Thresholding import Thresholding
 from Classes.ExtendedWidgets.CanvasWidget import CanvasWidget
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
@@ -558,11 +558,13 @@ class Backend:
         ax1.imshow(input_img, cmap="gray")
         ax1.axis(axis_disabled)
         ax1.set_title("Input Image", color="white")
-
-        ax2.imshow(output_img, cmap=grey)
+        if (output_img is None): 
+            ax2.imshow(np.zeros_like(input_img))
+            
+        else:
+            ax2.imshow(output_img, cmap=grey)
         ax2.axis(axis_disabled)
         ax2.set_title("Output Image", color="white")
-
         # Reduce the white margins
         self.ui.main_viewport_figure_canvas.figure.subplots_adjust(
             left=0, right=1, bottom=0.05, top=0.95
@@ -1210,7 +1212,32 @@ class Backend:
         pass
 
     def thresholding(self):
-        pass
+        """
+        Description:
+            - Makes an instance of the AdvancedThresholding effect class
+            and adds it to the current image.
+        """
+        if self.current_image_data is None:
+            self.show_message(
+                "Error", "Please load an image first.", QMessageBox.Critical
+            )
+            return
+
+        if self._check_conversion() == 0:
+            return
+        advanced_threshold_effect = AdvancedThresholding(self.grayscale_image, self.ui)
+        # Noise Effect Signal
+        advanced_threshold_effect.attributes_updated.connect(self.update_output_image)
+        # Get the output image after applying the noise
+        self.output_image = advanced_threshold_effect.output_image
+        # UI Changes and Setters
+        self.ui.scroll_area_VLayout.insertWidget(
+            0, advanced_threshold_effect.thresholding_groupbox
+        )
+        self.current_image.add_applied_effect(advanced_threshold_effect.title, advanced_threshold_effect.attributes)
+        self.current_image.set_output_image(self.output_image)
+        self.update_tree()
+        self.display_image(self.current_image_data, self.output_image)
 
     def segmentation(self):
         pass

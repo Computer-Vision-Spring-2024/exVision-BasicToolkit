@@ -14,30 +14,50 @@ from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 from Classes.Helpers.Features import *
 from Classes.Helpers.HelperFunctions import Normalized_histogram_computation, _pad_image
 from PyQt5.QtCore import pyqtSignal
+from PyQt5 import QtWidgets
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
 
 
 class AdvancedThresholding(QDoubleClickPushButton):
     _instance_counter = 0
     attributes_updated = pyqtSignal(np.ndarray)
 
-    def __init__(self, parent=None, *args, **kwargs):
+    def __init__(self, imageData ,ui, parent=None, *args, **kwargs):
         super(AdvancedThresholding, self).__init__(parent)
 
         # For naming the instances of the effect
         AdvancedThresholding._instance_counter += 1
-        self.title = f"Noise.{AdvancedThresholding._instance_counter:03d}"
+        self.title = f"AdvancedThresholding.{AdvancedThresholding._instance_counter:03d}"
         self.setText(self.title)  # Set the text of the button to its title
-
+        self.ui= ui
         # Attributes
-
+        self.histogram_global_thresholds_figure_canvas= None 
         # The group box that will contain the effect options
         self.thresholding_groupbox = AdvancedThresholdingGroupBox(self.title)
         self.thresholding_groupbox.setVisible(False)
 
         # Pass the AdvancedThresholding instance to the AdvancedThresholdingGroupBox class
         self.thresholding_groupbox.advanced_thresholding_effect = self
+        self.grayscale_image = imageData
+        self.output_image = imageData
+        self.number_of_thresholds = self.thresholding_groupbox.number_of_thresholds_slider.value()
+        self.thresholding_type = "Optimal - Binary"
+        self.local_or_global = "Global"
+        self.otsu_step = self.thresholding_groupbox.otsu_step_spinbox.value()
+        self.separability_measure = 0
+        self.global_thresholds = None
 
         # Connect the signals of the thresholding groupbox
+        self.thresholding_groupbox.apply_thresholding.clicked.connect(self.apply_thresholding)
+        self.thresholding_groupbox.number_of_thresholds_slider.setEnabled(False)
+        self.thresholding_groupbox.number_of_thresholds_slider.valueChanged.connect(
+            self.update_attributes
+        )
+        self.thresholding_groupbox.local_checkbox.stateChanged.connect(self.local_global_thresholding)
+        self.thresholding_groupbox.global_checkbox.stateChanged.connect(self.local_global_thresholding)
+        self.thresholding_groupbox.otsu_step_spinbox.setEnabled(False)
+
 
         # Store the attributes of the effect to be easily stored in the images instances.
         self.attributes = self.attributes_dictionary()
@@ -49,9 +69,9 @@ class AdvancedThresholding(QDoubleClickPushButton):
             - Returns a dictionary containing the attributes of the effect.
         """
         return {
-            "type": self.type,
-            "val01": self.val01,
-            "val02": self.val02,
+            "type": self.thresholding_type,
+            "local_global": self.local_or_global,
+            "number_of_thresholds": self.number_of_thresholds,
             "output": self.output_image,
             "groupbox": self.thresholding_groupbox,
             "final_result": self.update_attributes,
@@ -61,73 +81,109 @@ class AdvancedThresholding(QDoubleClickPushButton):
     def update_attributes(self):
         """
         Description:
-            - Updates the parameters of the noise effect depending on
+            - Updates the parameters of the advanced thresholding effect depending on
                 the associated effect groupbox.
         """
-        self.val01 = self.thresholding_groupbox.lower_spinbox.value() / 50
-        self.val02 = self.thresholding_groupbox.upper_spinbox.value() / 50
-        self.type = self.thresholding_groupbox.noise_type_comb.currentText()
-        self.output_image = self.calculate_noise()
-        self.attibutes = self.attributes_dictionary()
-        self.attributes_updated.emit(self.output_image)
-
-    def calculate_noise(self):
-        if self.type == "Uniform":
-            return self.generate_uniform_noise()
-        elif self.type == "Gaussian":
-            return self.generate_gaussian_noise()
-        elif self.type == "Salt & Pepper":
-            return self.generate_salt_pepper_noise()
-
-    ## ============== Thresholding Methods ============== ##
-    def get_thresholding_parameters(self):
-        self.number_of_thresholds = self.ui.number_of_thresholds_slider.value()
-        self.thresholding_type = self.ui.thresholding_comboBox.currentText()
-        self.otsu_step = self.ui.otsu_step_spinbox.value()
-        self.ui.number_of_thresholds.setText(
+        
+        self.number_of_thresholds = self.thresholding_groupbox.number_of_thresholds_slider.value()
+        self.thresholding_type = self.thresholding_groupbox.thresholding_type_comboBox.currentText()
+        self.otsu_step = self.thresholding_groupbox.otsu_step_spinbox.value()
+        self.thresholding_groupbox.number_of_thresholds_label.setText(
             "Number of thresholds: " + str(self.number_of_thresholds)
         )
         if self.thresholding_type == "OTSU":
-            self.ui.number_of_thresholds_slider.setEnabled(True)
-            self.ui.otsu_step_spinbox.setEnabled(True)
+            self.thresholding_groupbox.number_of_thresholds_slider.setEnabled(True)
+            self.thresholding_groupbox.otsu_step_spinbox.setEnabled(True)
         else:
-            self.ui.number_of_thresholds_slider.setEnabled(False)
-            self.ui.otsu_step_spinbox.setEnabled(False)
+            self.thresholding_groupbox.number_of_thresholds_slider.setEnabled(False)
+            self.thresholding_groupbox.otsu_step_spinbox.setEnabled(False)
+        self.attibutes = self.attributes_dictionary()
+
+
+    ## ============== Thresholding Methods ============== ##
+    def generate_subplot(self):
+        self.tab = QtWidgets.QWidget()
+        self.tab.setObjectName("tab")
+        self.verticalLayout_global_thresholds = QtWidgets.QVBoxLayout(self.tab)
+        self.verticalLayout_global_thresholds.setObjectName("horizontalLayout_37")
+        self.histogram_global_thresholds_frame = QtWidgets.QFrame(self.tab)
+        self.histogram_global_thresholds_frame.setObjectName("frame_3")
+        self.histogram_global_thresholds_label = QtWidgets.QLabel(self.tab)
+        self.histogram_global_thresholds_label.setObjectName("global_thresholds_label")
+        self.verticalLayout_global_thresholds.addWidget(
+            self.histogram_global_thresholds_frame
+        )
+        self.verticalLayout_global_thresholds.addWidget(
+            self.histogram_global_thresholds_label
+        )
+        self.ui.image_workspace.addTab(self.tab, "Histogram tab")
+        self.histogram_global_thresholds_hlayout = QtWidgets.QHBoxLayout(
+            self.histogram_global_thresholds_frame
+        )
+        self.histogram_global_thresholds_hlayout.setObjectName(
+            "histogram_global_thresholds_hlayout"
+        )
+        self.histogram_global_thresholds_figure = plt.figure()
+        self.histogram_global_thresholds_figure_canvas = FigureCanvas(
+            self.histogram_global_thresholds_figure
+        )
+        self.histogram_global_thresholds_hlayout.addWidget(
+            self.histogram_global_thresholds_figure_canvas
+        )
+
+    def plot_histogram(self):
+        """ "
+        Description:
+            - Plots the histogram with red vertical lines plotted at the threshold values
+        """
+        if self.histogram_global_thresholds_figure_canvas == None:
+            self.generate_subplot() 
+        self.histogram_global_thresholds_figure_canvas.figure.clear()
+        ax = self.histogram_global_thresholds_figure_canvas.figure.add_subplot(111)
+        self.histogram_global_thresholds_label.setText(" ")
+        ax.hist(self.grayscale_image.flatten(), bins=256, range=(0, 256), alpha=0.75)
+        for thresh in self.global_thresholds[0]:
+            ax.axvline(x=thresh, color="r")
+            thresh = int(thresh)
+            # Convert the threshold to string with 3 decimal places and add it to the label text
+            current_text = self.histogram_global_thresholds_label.text()
+            self.histogram_global_thresholds_label.setText(
+                current_text + " " + str(thresh)
+            )
+
+        ax.axis("on")
+        ax.set_title("Histogram")
+        self.histogram_global_thresholds_figure_canvas.figure.subplots_adjust(left=0.1, right=0.90, bottom=0.08, top=0.95)
+        self.histogram_global_thresholds_figure_canvas.draw()
 
     def local_global_thresholding(self, state):
         sender = self.sender()
         if state == 2:  # Checked state
-            if sender == self.ui.local_checkbox:
-                self.ui.global_checkbox.setChecked(False)
+            if sender == self.thresholding_groupbox.local_checkbox:
+                self.thresholding_groupbox.global_checkbox.setChecked(False)
                 self.local_or_global = "Local"
             else:
-                self.ui.local_checkbox.setChecked(False)
+                self.thresholding_groupbox.local_checkbox.setChecked(False)
                 self.local_or_global = "Global"
 
     def apply_thresholding(self):
-        self.get_thresholding_parameters()
+        self.update_attributes()
         if self.thresholding_type == "Optimal - Binary":
             if self.local_or_global == "Local":
-                self.thresholding_output = self.local_thresholding(
-                    self.thresholding_grey_input, self.optimal_thresholding
+                self.output_image = self.local_thresholding(
+                    self.grayscale_image, self.optimal_thresholding
                 )
             elif self.local_or_global == "Global":
-                self.thresholding_output, self.global_thresholds, _ = (
-                    self.optimal_thresholding(self.thresholding_grey_input)
+                self.output_image, self.global_thresholds, _ = (
+                    self.optimal_thresholding(self.grayscale_image)
                 )
-                self.display_image(
-                    self.thresholding_grey_input,
-                    self.ui.histogram_global_thresholds_figure_canvas,
-                    "Histogram",
-                    True,
-                    True,
-                    "on",
-                )
+                
+                self.plot_histogram()
 
         elif self.thresholding_type == "OTSU":
             if self.local_or_global == "Local":
-                self.thresholding_output = self.local_thresholding(
-                    grayscale_image=self.thresholding_grey_input,
+                self.output_image = self.local_thresholding(
+                    grayscale_image=self.grayscale_image,
                     threshold_algorithm=lambda img: self.multi_otsu(
                         img, self.number_of_thresholds, self.otsu_step
                     ),
@@ -135,32 +191,21 @@ class AdvancedThresholding(QDoubleClickPushButton):
                 )
             elif self.local_or_global == "Global":
                 (
-                    self.thresholding_output,
+                    self.output_image,
                     self.global_thresholds,
                     self.separability_measure,
                 ) = self.multi_otsu(
-                    self.thresholding_grey_input,
+                    self.grayscale_image,
                     self.number_of_thresholds,
                     self.otsu_step,
                 )
-                self.display_image(
-                    self.thresholding_grey_input,
-                    self.ui.histogram_global_thresholds_figure_canvas,
-                    "Histogram",
-                    True,
-                    True,
-                    "on",
-                )
-                self.ui.separability_measure.setText(
+                self.plot_histogram()
+                self.thresholding_groupbox.separability_measure_label.setText(
                     "Separability Measure = {:.3f}".format(self.separability_measure)
                 )
 
-        self.display_image(
-            self.thresholding_output,
-            self.ui.thresholding_output_figure_canvas,
-            "Thresholding Output",
-            True,
-        )
+        self.attributes_updated.emit(self.output_image)
+        
 
     def optimal_thresholding(self, image):
         """
