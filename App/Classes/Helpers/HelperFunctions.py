@@ -465,7 +465,7 @@ def Normalized_histogram_computation(Image):
     Image_Width = Image.shape[1]
     # Initialize the histogram array with zeros. The array has 256 element, each corresponding to a pixel intensity value (0 to 255)
     Histogram = np.zeros([256])
-    print(Histogram.shape)
+    # print(Histogram.shape)
     # Compute the histogram for each pixel in each channel
     for x in range(0, Image_Height):
         for y in range(0, Image_Width):

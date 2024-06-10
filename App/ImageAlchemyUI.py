@@ -5,14 +5,11 @@ os.environ["QT_API"] = "PyQt5"
 # To solve the problem of the icons with relative
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-import webbrowser
-
 import matplotlib.pyplot as plt
 
 # in CMD: pip install qdarkstyle -> pip install pyqtdarktheme
 import qdarktheme
 from Classes.ExtendedWidgets.CustomTabWidget import CustomTabWidget
-from Classes.ExtendedWidgets.UserGuide import UserGuideDialog
 from ImageAlchemyBackend import Backend
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -334,7 +331,7 @@ class Ui_ImgProcessor(object):
         self.actionExit = QtWidgets.QAction(ImgAlchemy)
         self.actionExit.setObjectName("actionExit_2")
         self.actionExit.setShortcut("Ctrl+Q")
-
+        self.actionExit.triggered.connect(self.exit_application)
         # Add actions to menuFile
         self.menuFile.addAction(self.actionImport_Image)
         self.menuFile.addSeparator()
@@ -358,9 +355,13 @@ class Ui_ImgProcessor(object):
         self.menu_standard_images_library.setObjectName("menu_standard_images_library")
         self.menu_hough_samples = QtWidgets.QMenu(self.menuTools)
         self.menu_hough_samples.setObjectName("menu_hough_samples")
+        # Action for Face Detection Examples
+        self.actionFace_detection = QtWidgets.QAction(ImgAlchemy)
+        self.actionFace_detection.setObjectName("face_detection")
         # Add submenus to menuTools
         self.menuTools.addAction(self.menu_standard_images_library.menuAction())
         self.menuTools.addAction(self.menu_hough_samples.menuAction())
+        self.menuTools.addAction(self.actionFace_detection)
 
         # Actions for the standard library
         self.actionClassic = QtWidgets.QAction(ImgAlchemy)
@@ -409,12 +410,10 @@ class Ui_ImgProcessor(object):
         self.actionControls = QtWidgets.QAction(ImgAlchemy)
         self.actionControls.setObjectName("actionControls")
         self.actionControls.setShortcut("Ctrl+C")
-        self.actionControls.triggered.connect(self.open_user_guide)
         # App Documentation
         self.actionApp_Documentation = QtWidgets.QAction(ImgAlchemy)
         self.actionApp_Documentation.setObjectName("actionApp_Documentation")
         self.actionApp_Documentation.setShortcut("Ctrl+H")
-        self.actionApp_Documentation.triggered.connect(self.open_documentation)
 
         # Add actions to menuHelp
         self.menuHelp.addAction(self.actionControls)
@@ -554,12 +553,8 @@ class Ui_ImgProcessor(object):
             not self.control_panel_header_btn.isChecked()
         )
 
-    def open_user_guide(self):
-        user_guide = UserGuideDialog()
-        user_guide.exec_()
-
-    def open_documentation(self):
-        webbrowser.open("https://github.com/Computer-Vision-Spring-2024/Task-1")
+    def exit_application(self):
+        sys.exit()
 
     def retranslateUi(self, ImgProcessor):
         _translate = QtCore.QCoreApplication.translate
@@ -577,6 +572,9 @@ class Ui_ImgProcessor(object):
             _translate("ImgProcessor", "Standard Images Library")
         )
         self.menu_hough_samples.setTitle(_translate("ImgProcessor", "Hough Samples"))
+        self.actionFace_detection.setText(
+            _translate("ImgProcessor", "Face Detection Examples")
+        )
         self.img_history_tab_widget.setTabText(
             self.img_history_tab_widget.indexOf(self.img_history_tab),
             _translate("ImgProcessor", "Image History"),

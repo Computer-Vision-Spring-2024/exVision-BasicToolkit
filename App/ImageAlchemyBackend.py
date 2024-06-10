@@ -1,4 +1,5 @@
 import os
+import webbrowser
 from collections import defaultdict
 
 import cv2
@@ -21,6 +22,7 @@ from Classes.Effects.SNAKE import SNAKE
 from Classes.Effects.Thresholding import Thresholding
 from Classes.ExtendedWidgets.CanvasWidget import CanvasWidget
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from Classes.ExtendedWidgets.UserGuide import UserGuideDialog
 from Classes.Helpers.HelperFunctions import (
     BGR2LAB,
     Histogram_computation,
@@ -44,9 +46,6 @@ class Image:
         self.grayscale_img = None
 
         self.output_img = None  # The output image of the last appied effect
-        self.cumulative_output = (
-            None  # The output image of appliying all the effects as "chain"
-        )
 
         self.applied_effects = (
             {}
@@ -66,15 +65,6 @@ class Image:
         """
         self.output_img = output_data
 
-    def set_cumulative_output(self, output_data):
-        """
-        Description:
-            - Sets the cumulative output image for the current image.
-        Args:
-            - output_data: The cumulative output image data to be saved.
-        """
-        self.cumulative_output = output_data
-
     def add_applied_effect(self, effect_name, effect_attributes):
         """
         Description:
@@ -90,8 +80,14 @@ class Image:
         self.applied_effects[effect_name] = effect_attributes
 
     # =================================== Getters ====================================== #
+    def get_original_img(self):
+        return self.img_data
+
     def get_grayscale_img(self):
         return self.grayscale_img
+
+    def get_output_img(self):
+        return self.output_img
 
 
 class Backend:
@@ -104,8 +100,8 @@ class Backend:
         self.current_image_data = None  # It holds the current image data
         self.grayscale_image = None  # It holds the grayscale image data
         self.is_color = False  # It holds the state of the image (grayscale or not)
+        self.is_3d = False  # Is the image has three channels
         self.output_image = None  # It holds the output image data
-        self.cumulative_output = None  # It holds the cumulative output image data
         self.image_history = {}  # It holds all images that was opened by the user
         # The key is the name of the file and the value is the img data
 
@@ -166,7 +162,7 @@ class Backend:
             },
             {
                 "name": "Frequency domain Filters",
-                "icon": "Resources/Icons/Effects/freq_filter.png",
+                "icon": "Resources/Icons/Effects/freq-filter.png",
                 "function": self.frequency_domain_filters,
             },
             {
@@ -196,7 +192,7 @@ class Backend:
             },
             {
                 "name": "Advanced Thresholding",
-                "icon": "Resources/Icons/Effects/thresholding02.png",
+                "icon": "Resources/Icons/Effects/advanced-thresholding.png",
                 "function": self.thresholding,
             },
             {
@@ -206,12 +202,12 @@ class Backend:
             },
             {
                 "name": "Face Recognition",
-                "icon": "Resources/Icons/Effects/face_recognition.png",
+                "icon": "Resources/Icons/Effects/face-recognition.png",
                 "function": self.face_recognition,
             },
             {
                 "name": "Face Detection",
-                "icon": "Resources/Icons/Effects/face_detection.png",
+                "icon": "Resources/Icons/Effects/face-detection.png",
                 "function": self.face_detection,
             },
         ]
@@ -290,6 +286,12 @@ class Backend:
                 None, "Resources/HoughSamples/" + self.ui.actionEllipse.text()
             )
         )
+        self.ui.actionFace_detection.triggered.connect(
+            lambda: self.load_image(
+                None, "Resources/" + self.ui.actionFace_detection.text()
+            )
+        )
+
         ## === SideBar: Effects === ##
         # Create and add effects to the collapsed and expanded views of the left bar
         for i in range(len(self.effects_library)):
@@ -333,7 +335,7 @@ class Backend:
         ## === Initialize a counter to keep track of the number of hybrid images created === ##
         self.hybrid_img_counter = 0
 
-        ## === Detection Image Path === ##
+        ## === Face Detection Image Path === ##
         self.detection_img_path = None
 
         ## === Clear Image History: Initially Disabled === ##
@@ -347,14 +349,14 @@ class Backend:
         # Initially disable all saving and clearing actions
         self.enable_disable_actions(False)
 
-        ## === Help Menu: Controls === ##
-        self.ui.actionControls.triggered.connect(self.show_controls)
+        ## === Help Menu: Controls and Documentation === ##
+        self.ui.actionControls.triggered.connect(self.open_user_guide)
+        self.ui.actionApp_Documentation.triggered.connect(self.open_documentation)
 
     # ==================================== Methods ===================================== #
 
     # Importing and Plotting Functions #
     # ================================ #
-
     def load_image(self, file_path=None, folder=""):
         """
         Description:
@@ -363,7 +365,7 @@ class Backend:
 
         Args:
             - file_path: The path of the image to be loaded.
-            - folder: The folder to be opened when the file dialog box is opened.
+            - folder: The folder to be opened to pick the image from.
         """
         if file_path is None:
             file_path, _ = QFileDialog.getOpenFileName(
@@ -385,20 +387,24 @@ class Backend:
                 )
                 return
 
-            self.detection_img_path = file_path
-
             # Instantiate an image object,that will be helpful to easily access the image data
             img = Image(file_path)
             img.img_data = cv2.imread(file_path, 1)
+
             if img.img_data is not None:
+
                 tab_index = self.ui.image_workspace.currentIndex()
                 tab_text = self.ui.image_workspace.tabText(tab_index)
+
+                # Check whether you are in a "Hybrid Images" tab or not
+                # If so, prompt the user to open an image and to choose whether it is the first or second image.
                 if tab_text == "Hybrid viewport":
                     self.display_selection_dialog(img.img_data, file_path)
                 else:
                     # Convert BGR to RGB to correct plotting
                     img.img_data = cv2.cvtColor(img.img_data, cv2.COLOR_BGR2RGB)
                     img.output_img = img.img_data
+
                     # Store the image data in the image history list
                     file_name = file_path.split("/")[-1]
                     if file_name not in self.image_history:
@@ -421,6 +427,7 @@ class Backend:
                         self.ui.img_history_tree.addTopLevelItem(parent_image)
 
                         self.display_image(img.img_data, img.output_img)
+
                         # To affect the recent added image
                         self.current_image = img
                         self.current_image_data = img.img_data
@@ -429,7 +436,7 @@ class Backend:
             else:
                 self.show_message("Error", "Invalid Image", QMessageBox.Critical)
 
-        # Now, we have something to save or delete, so enable the saving and clearing options
+        # Now, we have something to save or delete, so enable the saving and clear history option
         self.enable_disable_actions(True)
 
     def load_old_image(self, item):
@@ -609,7 +616,7 @@ class Backend:
             - icon_type: Type of icon to be displayed (QMessageBox.Information, QMessageBox.Critical, etc.).
         """
         msg = QMessageBox()
-        msg.setIconPixmap(QIcon("icon.png").pixmap(64, 64))
+        msg.setIconPixmap(QIcon("Resources/Icons/App_Icon.png").pixmap(64, 64))
         msg.setIcon(icon_type)
         msg.setWindowTitle(title)
         msg.setText(message)
@@ -626,7 +633,7 @@ class Backend:
             - path: The path of the image.
         """
         msgBox = QMessageBox()
-        msgBox.setIconPixmap(QIcon("icon.png").pixmap(64, 64))
+        msgBox.setIconPixmap(QIcon("Resources/Icons/App_Icon.png").pixmap(64, 64))
         msgBox.setIcon(QMessageBox.Question)
         msgBox.setText("Select an Image")
         msgBox.setWindowTitle("Image Selection")
@@ -1462,7 +1469,13 @@ class Backend:
                 QMessageBox.Information,
             )
 
-    # HelpMenu: Controls #
+    # HelpMenu: Controls and Documentation #
     # ================== #
-    def show_controls(self):
-        pass
+    def open_user_guide(self):
+        user_guide = UserGuideDialog()
+        user_guide.exec_()
+
+    def open_documentation(self):
+        webbrowser.open(
+            "https://github.com/Computer-Vision-Spring-2024/ImageAlchemy/blob/main/README.md"
+        )
