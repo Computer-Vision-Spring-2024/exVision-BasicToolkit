@@ -1,38 +1,35 @@
-import os
 from itertools import combinations
-
-import numpy as np
-
-# To prevent conflicts with pyqt6
-os.environ["QT_API"] = "PyQt5"
-# To solve the problem of the icons with relative path
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from typing import *
 
-from Classes.EffectsWidgets.Thresholding02GroupBox import AdvancedThresholdingGroupBox
+import matplotlib.pyplot as plt
+import numpy as np
+from Classes.EffectsWidgets.AdvancedThresholdingGroupBox import (
+    AdvancedThresholdingGroupBox,
+)
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 from Classes.Helpers.Features import *
 from Classes.Helpers.HelperFunctions import Normalized_histogram_computation, _pad_image
-from PyQt5.QtCore import pyqtSignal
-from PyQt5 import QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-import matplotlib.pyplot as plt
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import pyqtSignal
 
 
 class AdvancedThresholding(QDoubleClickPushButton):
     _instance_counter = 0
     attributes_updated = pyqtSignal(np.ndarray)
 
-    def __init__(self, imageData ,ui, parent=None, *args, **kwargs):
+    def __init__(self, imageData, ui, parent=None, *args, **kwargs):
         super(AdvancedThresholding, self).__init__(parent)
 
         # For naming the instances of the effect
         AdvancedThresholding._instance_counter += 1
-        self.title = f"AdvancedThresholding.{AdvancedThresholding._instance_counter:03d}"
+        self.title = (
+            f"AdvancedThresholding.{AdvancedThresholding._instance_counter:03d}"
+        )
         self.setText(self.title)  # Set the text of the button to its title
-        self.ui= ui
+        self.ui = ui
         # Attributes
-        self.histogram_global_thresholds_figure_canvas= None 
+        self.histogram_global_thresholds_figure_canvas = None
         # The group box that will contain the effect options
         self.thresholding_groupbox = AdvancedThresholdingGroupBox(self.title)
         self.thresholding_groupbox.setVisible(False)
@@ -41,7 +38,9 @@ class AdvancedThresholding(QDoubleClickPushButton):
         self.thresholding_groupbox.advanced_thresholding_effect = self
         self.grayscale_image = imageData
         self.output_image = imageData
-        self.number_of_thresholds = self.thresholding_groupbox.number_of_thresholds_slider.value()
+        self.number_of_thresholds = (
+            self.thresholding_groupbox.number_of_thresholds_slider.value()
+        )
         self.thresholding_type = "Optimal - Binary"
         self.local_or_global = "Global"
         self.otsu_step = self.thresholding_groupbox.otsu_step_spinbox.value()
@@ -49,15 +48,20 @@ class AdvancedThresholding(QDoubleClickPushButton):
         self.global_thresholds = None
 
         # Connect the signals of the thresholding groupbox
-        self.thresholding_groupbox.apply_thresholding.clicked.connect(self.apply_thresholding)
+        self.thresholding_groupbox.apply_thresholding.clicked.connect(
+            self.apply_thresholding
+        )
         self.thresholding_groupbox.number_of_thresholds_slider.setEnabled(False)
         self.thresholding_groupbox.number_of_thresholds_slider.valueChanged.connect(
             self.update_attributes
         )
-        self.thresholding_groupbox.local_checkbox.stateChanged.connect(self.local_global_thresholding)
-        self.thresholding_groupbox.global_checkbox.stateChanged.connect(self.local_global_thresholding)
+        self.thresholding_groupbox.local_checkbox.stateChanged.connect(
+            self.local_global_thresholding
+        )
+        self.thresholding_groupbox.global_checkbox.stateChanged.connect(
+            self.local_global_thresholding
+        )
         self.thresholding_groupbox.otsu_step_spinbox.setEnabled(False)
-
 
         # Store the attributes of the effect to be easily stored in the images instances.
         self.attributes = self.attributes_dictionary()
@@ -84,9 +88,13 @@ class AdvancedThresholding(QDoubleClickPushButton):
             - Updates the parameters of the advanced thresholding effect depending on
                 the associated effect groupbox.
         """
-        
-        self.number_of_thresholds = self.thresholding_groupbox.number_of_thresholds_slider.value()
-        self.thresholding_type = self.thresholding_groupbox.thresholding_type_comboBox.currentText()
+
+        self.number_of_thresholds = (
+            self.thresholding_groupbox.number_of_thresholds_slider.value()
+        )
+        self.thresholding_type = (
+            self.thresholding_groupbox.thresholding_type_comboBox.currentText()
+        )
         self.otsu_step = self.thresholding_groupbox.otsu_step_spinbox.value()
         self.thresholding_groupbox.number_of_thresholds_label.setText(
             "Number of thresholds: " + str(self.number_of_thresholds)
@@ -98,7 +106,6 @@ class AdvancedThresholding(QDoubleClickPushButton):
             self.thresholding_groupbox.number_of_thresholds_slider.setEnabled(False)
             self.thresholding_groupbox.otsu_step_spinbox.setEnabled(False)
         self.attibutes = self.attributes_dictionary()
-
 
     ## ============== Thresholding Methods ============== ##
     def generate_subplot(self):
@@ -137,7 +144,7 @@ class AdvancedThresholding(QDoubleClickPushButton):
             - Plots the histogram with red vertical lines plotted at the threshold values
         """
         if self.histogram_global_thresholds_figure_canvas == None:
-            self.generate_subplot() 
+            self.generate_subplot()
         self.histogram_global_thresholds_figure_canvas.figure.clear()
         ax = self.histogram_global_thresholds_figure_canvas.figure.add_subplot(111)
         self.histogram_global_thresholds_label.setText(" ")
@@ -153,7 +160,9 @@ class AdvancedThresholding(QDoubleClickPushButton):
 
         ax.axis("on")
         ax.set_title("Histogram")
-        self.histogram_global_thresholds_figure_canvas.figure.subplots_adjust(left=0.1, right=0.90, bottom=0.08, top=0.95)
+        self.histogram_global_thresholds_figure_canvas.figure.subplots_adjust(
+            left=0.1, right=0.90, bottom=0.08, top=0.95
+        )
         self.histogram_global_thresholds_figure_canvas.draw()
 
     def local_global_thresholding(self, state):
@@ -177,7 +186,7 @@ class AdvancedThresholding(QDoubleClickPushButton):
                 self.output_image, self.global_thresholds, _ = (
                     self.optimal_thresholding(self.grayscale_image)
                 )
-                
+
                 self.plot_histogram()
 
         elif self.thresholding_type == "OTSU":
@@ -205,7 +214,6 @@ class AdvancedThresholding(QDoubleClickPushButton):
                 )
 
         self.attributes_updated.emit(self.output_image)
-        
 
     def optimal_thresholding(self, image):
         """

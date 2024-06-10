@@ -1,6 +1,11 @@
 import os
+import pickle
+from typing import *
 
 import numpy as np
+from Classes.EffectsWidgets.FaceDetectionGroupBox import FaceDetectionGroupBox
+from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
+from Classes.Helpers.Features import *
 from Classes.Helpers.HelperFunctions import (
     WINDOW_SIZE,
     Location,
@@ -14,17 +19,6 @@ from Classes.Helpers.HelperFunctions import (
     strong_classifier,
     to_float_array,
 )
-
-# To prevent conflicts with pyqt6
-os.environ["QT_API"] = "PyQt5"
-# To solve the problem of the icons with relative path
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-import pickle
-from typing import *
-
-from Classes.EffectsWidgets.FaceDetectionGroupBox import FaceDetectionGroupBox
-from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
-from Classes.Helpers.Features import *
 from PIL import Image
 from PyQt5.QtCore import pyqtSignal
 

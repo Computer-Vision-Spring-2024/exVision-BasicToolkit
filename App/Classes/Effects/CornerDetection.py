@@ -1,15 +1,8 @@
-import os
-
-import numpy as np
-
-# To prevent conflicts with pyqt6
-os.environ["QT_API"] = "PyQt5"
-# To solve the problem of the icons with relative path
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 import time
 from typing import *
 
 import cv2
+import numpy as np
 from Classes.EffectsWidgets.CornerDetectionGroupBox import CornerDetectionGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
 from Classes.Helpers.Features import *

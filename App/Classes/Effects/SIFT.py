@@ -1,12 +1,3 @@
-import os
-
-import numpy as np
-
-# To prevent conflicts with pyqt6
-os.environ["QT_API"] = "PyQt5"
-# To solve the problem of the icons with relative path
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-import os
 import time
 from math import cos, sin
 from typing import *
@@ -88,7 +79,6 @@ class SIFT(QDoubleClickPushButton):
         elif self.type == "Salt & Pepper":
             return self.generate_salt_pepper_noise()
 
-
     ## ============== SIFT Methods ============== ##
     # == Setters == #
     def get_new_SIFT_parameters(self):
@@ -105,7 +95,6 @@ class SIFT(QDoubleClickPushButton):
         self.ui.r_ratio.setText(f"r_ratio: {self.r_ratio}")
         self.ui.contrast_th.setText(f"contrast_th: {self.contrast_th}")
         self.ui.confusion_factor.setText(f"confusion_factor: {self.confusion_factor}")
-
 
     def gaussian_filter_kernel(self, sigma, kernel_size=None):
         """
@@ -134,7 +123,6 @@ class SIFT(QDoubleClickPushButton):
 
         return kernel
 
-
     def generateGaussianKernels(self, sigma, s):
         """
         Description:
@@ -160,7 +148,6 @@ class SIFT(QDoubleClickPushButton):
             scale_level *= k
             gaussian_kernels.append(self.gaussian_filter_kernel(scale_level))
         return gaussian_kernels
-
 
     def generate_octaves_pyramid(
         self, img, num_octaves=4, s_value=2, sigma=1.6, contrast_th=0.03, ratio_th=10
@@ -211,7 +198,6 @@ class SIFT(QDoubleClickPushButton):
             img = gaussian_images_in_octave[-3][::2, ::2]
         return gaussian_images_pyramid, DOG_pyramid, keypoints
 
-
     def generate_gaussian_images_in_octave(
         self, image, gaussian_kernels, contrast_th, ratio_th, octave_index
     ):
@@ -250,7 +236,9 @@ class SIFT(QDoubleClickPushButton):
             blurred_image = convolve2d(image, gaussian_kernel, "same", "symm")
             gaussian_images_in_octave.append(blurred_image)
             # subtract each two adjacent images and add the result to the difference of gaussians of the octave
-            DOG_octave.append(gaussian_images_in_octave[-1] - gaussian_images_in_octave[-2])
+            DOG_octave.append(
+                gaussian_images_in_octave[-1] - gaussian_images_in_octave[-2]
+            )
             if len(DOG_octave) > 2:
                 # from each three difference of gaussians images, detect possible keypoints through extrema detection then applying keypoints localization
                 # and filtering to discarde unstable keypoints
@@ -260,11 +248,12 @@ class SIFT(QDoubleClickPushButton):
                         len(DOG_octave) - 2,
                         contrast_th,
                         ratio_th,
-                        np.concatenate([o[:, :, np.newaxis] for o in DOG_octave], axis=2),
+                        np.concatenate(
+                            [o[:, :, np.newaxis] for o in DOG_octave], axis=2
+                        ),
                     )
                 )
         return gaussian_images_in_octave, DOG_octave, keypoints
-
 
     def get_keypoints(self, DOG_octave, k, contrast_th, ratio_th, DoG_full_array):
         """
@@ -313,7 +302,6 @@ class SIFT(QDoubleClickPushButton):
                     kp = np.array([i, j, k])
                     keypoints.append(kp)
         return np.array(keypoints)
-
 
     def localize_keypoint(self, D, x, y, s):
         """
@@ -365,7 +353,6 @@ class SIFT(QDoubleClickPushButton):
         offset = -np.linalg.inv(H).dot(J)  # ((3 x 3) . 3 x 1)
         return offset, J, H[:2, :2], x, y, s
 
-
     def visualize_pyramid(self, pyramid):
         fig, axes = plt.subplots(
             nrows=len(pyramid), ncols=len(pyramid[0]), figsize=(12, 12)
@@ -380,7 +367,6 @@ class SIFT(QDoubleClickPushButton):
         plt.tight_layout()
         plt.show()
 
-
     def visualize_DOC_for_octave(self, DOG):
         fig, axes = plt.subplots(nrows=len(DOG), ncols=len(DOG[0]), figsize=(12, 12))
 
@@ -392,7 +378,6 @@ class SIFT(QDoubleClickPushButton):
 
         plt.tight_layout()
         plt.show()
-
 
     def visualize_keypoints(self, pyramid, keypoints):
         fig, axes = plt.subplots(
@@ -412,7 +397,6 @@ class SIFT(QDoubleClickPushButton):
         plt.tight_layout()
         plt.show()
 
-
     def sift_resize(self, img, ratio=None):
         """
         Resize an image while maintaining its aspect ratio.
@@ -431,18 +415,18 @@ class SIFT(QDoubleClickPushButton):
         - `anti_aliasing=True` is used to smooth the edges of the resized image.
         """
         ratio = (
-            ratio if ratio is not None else np.sqrt((1024 * 1024) / np.prod(img.shape[:2]))
+            ratio
+            if ratio is not None
+            else np.sqrt((1024 * 1024) / np.prod(img.shape[:2]))
         )
         newshape = list(map(lambda d: int(round(d * ratio)), img.shape[:2]))
         img = resize(img, newshape, anti_aliasing=True)
         return img, ratio
 
-
     def convert_to_grayscale(self, image):
         if len(image.shape) == 3:
             return np.dot(image[..., :3], [0.2989, 0.5870, 0.1140])
         return image
-
 
     def represent_keypoints(self, keypoints, DoG):
         """
@@ -473,7 +457,6 @@ class SIFT(QDoubleClickPushButton):
             keypoints_as_images.append(keypoints_per_octave)
         return keypoints_as_images
 
-
     def sift_gradient(self, img):
         dx = np.array([-1, 0, 1]).reshape((1, 3))
         dy = dx.T
@@ -482,7 +465,6 @@ class SIFT(QDoubleClickPushButton):
         magnitude = np.sqrt(gx * gx + gy * gy)
         direction = np.rad2deg(np.arctan2(gy, gx)) % 360  # to wrap the direction
         return gx, gy, magnitude, direction
-
 
     def padded_slice(self, img, sl):
         """
@@ -516,7 +498,6 @@ class SIFT(QDoubleClickPushButton):
         )  # padding of zeros if the indices of sl is out of the image boundaries
         output[dst[0] : dst[1], dst[2] : dst[3]] = img[src[0] : src[1], src[2] : src[3]]
         return output
-
 
     def dog_keypoints_orientations(
         self, img_gaussians, keypoints, sigma_base, num_bins=36, s=2
@@ -578,7 +559,6 @@ class SIFT(QDoubleClickPushButton):
                         )  # there can be more than one descriptor to the same keypoint (another dominant angle)
         return kps
 
-
     def rotated_subimage(self, image, center, theta, width, height):
         """
         Rotate a subimage around a specified center point by a given angle.
@@ -618,13 +598,15 @@ class SIFT(QDoubleClickPushButton):
             borderMode=cv2.BORDER_CONSTANT,
         )
 
-
     def get_gaussian_mask(self, sigma, filter_size):
         if sigma > 0:
             kernel = np.fromfunction(
                 lambda x, y: (1 / (2 * np.pi * sigma**2))
                 * np.exp(
-                    -((x - (filter_size - 1) / 2) ** 2 + (y - (filter_size - 1) / 2) ** 2)
+                    -(
+                        (x - (filter_size - 1) / 2) ** 2
+                        + (y - (filter_size - 1) / 2) ** 2
+                    )
                     / (2 * sigma**2)
                 ),
                 (filter_size, filter_size),
@@ -632,7 +614,6 @@ class SIFT(QDoubleClickPushButton):
             return kernel / np.sum(kernel)
         else:
             raise ValueError("Invalid value of Sigma")
-
 
     def extract_sift_descriptors(
         self, img_gaussians, keypoints, base_sigma, num_bins=8, s=2
@@ -699,7 +680,6 @@ class SIFT(QDoubleClickPushButton):
             points.append((i, j, oct_idx, scale_idx, orientation))
         return points, descriptors
 
-
     def computeKeypointsAndDescriptors(
         self, image, n_octaves, s_value, sigma_base, constract_th, r_ratio
     ):
@@ -721,7 +701,6 @@ class SIFT(QDoubleClickPushButton):
         )
         return points, descriptors
 
-
     def kp_list_2_opencv_kp_list(self, kp_list):
         """represnet the keypoints as keyPoint objects"""
 
@@ -736,7 +715,6 @@ class SIFT(QDoubleClickPushButton):
             opencv_kp_list += [opencv_kp]
 
         return opencv_kp_list
-
 
     def match(self, img_a, pts_a, desc_a, img_b, pts_b, desc_b, tuning_distance=0.3):
         img_a, img_b = tuple(map(lambda i: np.uint8(i * 255), [img_a, img_b]))
@@ -775,7 +753,6 @@ class SIFT(QDoubleClickPushButton):
         )
 
         return img_match
-
 
     def apply_sift(self):
         start = time.time()

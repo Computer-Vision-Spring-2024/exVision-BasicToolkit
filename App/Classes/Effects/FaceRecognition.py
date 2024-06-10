@@ -1,14 +1,8 @@
 import os
-
-import numpy as np
-
-# To prevent conflicts with pyqt6
-os.environ["QT_API"] = "PyQt5"
-# To solve the problem of the icons with relative path
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from typing import *
 
 import cv2
+import numpy as np
 from Classes.Effects.PCA_class import PCA_class
 from Classes.EffectsWidgets.FaceRecognitionGroupBox import FaceRecognitionGroupBox
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton

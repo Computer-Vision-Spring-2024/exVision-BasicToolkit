@@ -3,11 +3,12 @@ from collections import defaultdict
 
 import cv2
 import numpy as np
+from Classes.Effects.AdvancedThresholding import AdvancedThresholding
 from Classes.Effects.CornerDetection import CornerDetection
 from Classes.Effects.EdgeDetector import EdgeDetector
 from Classes.Effects.Equalizer import Equalizer
 from Classes.Effects.FaceDetection import FaceDetection
-from Classes.Effects.FaceRecognition import FaceRecognitionGroupBox
+from Classes.Effects.FaceRecognition import FaceRecognition
 from Classes.Effects.Filter import Filter
 from Classes.Effects.FreqFilters import FreqFilters
 from Classes.Effects.HoughTransform import HoughTransform
@@ -16,7 +17,7 @@ from Classes.Effects.Noise import Noise
 from Classes.Effects.Normalize import Normalizer
 from Classes.Effects.Segmentation import Segmentation
 from Classes.Effects.SIFT import SIFT
-from Classes.Effects.Snake import SNAKE
+from Classes.Effects.SNAKE import SNAKE
 from Classes.Effects.Thresholding import Thresholding
 from Classes.ExtendedWidgets.CanvasWidget import CanvasWidget
 from Classes.ExtendedWidgets.DoubleClickPushButton import QDoubleClickPushButton
@@ -31,8 +32,6 @@ from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog, QGroupBox, QMessageBox
-
-from Classes.Effects.AdvancedThresholding import AdvancedThresholding
 
 
 class Image:
@@ -558,9 +557,9 @@ class Backend:
         ax1.imshow(input_img, cmap="gray")
         ax1.axis(axis_disabled)
         ax1.set_title("Input Image", color="white")
-        if (output_img is None): 
+        if output_img is None:
             ax2.imshow(np.zeros_like(input_img))
-            
+
         else:
             ax2.imshow(output_img, cmap=grey)
         ax2.axis(axis_disabled)
@@ -1234,7 +1233,9 @@ class Backend:
         self.ui.scroll_area_VLayout.insertWidget(
             0, advanced_threshold_effect.thresholding_groupbox
         )
-        self.current_image.add_applied_effect(advanced_threshold_effect.title, advanced_threshold_effect.attributes)
+        self.current_image.add_applied_effect(
+            advanced_threshold_effect.title, advanced_threshold_effect.attributes
+        )
         self.current_image.set_output_image(self.output_image)
         self.update_tree()
         self.display_image(self.current_image_data, self.output_image)

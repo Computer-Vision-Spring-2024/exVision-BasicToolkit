@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QGroupBox, QGridLayout, QLabel, QSlider
+from PyQt5.QtWidgets import QGridLayout, QGroupBox, QLabel, QSlider
+
 
 class GrayscaleConverter(QGroupBox):
     def __init__(self):
