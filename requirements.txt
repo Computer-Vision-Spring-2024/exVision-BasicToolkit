@@ -5,3 +5,5 @@ PyQt5==5.15.10
 pyqtdarktheme==2.1.0
 qdarkstyle==3.2.3
 scikit-image==0.22.0
+scipy==1.11.3
+Pillow==10.1.0

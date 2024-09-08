@@ -9,12 +9,13 @@ import matplotlib.pyplot as plt
 
 # in CMD: pip install qdarkstyle -> pip install pyqtdarktheme
 import qdarktheme
-from Classes.ExtendedWidgets.CustomTabWidget import CustomTabWidget
-from ImageAlchemyBackend import Backend
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCursor, QIcon
+
+from Classes.ExtendedWidgets.CustomTabWidget import CustomTabWidget
+from ImageAlchemyBackend import Backend
 
 
 class Ui_ImgProcessor(object):

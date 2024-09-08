@@ -47,9 +47,8 @@ class Image:
 
         self.output_img = None  # The output image of the last appied effect
 
-        self.applied_effects = (
-            {}
-        )  # Dictionary to store the applied effects and its parameters.
+        self.applied_effects = {}
+        # Dictionary to store the applied effects and its parameters.
         # They will be shown in the tree.
         Image.all_images.append(self)
         # To facilitate the access to the images, we will store them in a list
