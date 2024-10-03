@@ -32,9 +32,9 @@ class UserGuideDialog(QDialog):
 
         self.gif_index = 0
         self.gifs = [
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/Import__gif.gif",
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/Navigate.gif",
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/noise.gif",
+            "../README_resources/Import__gif.gif",
+            "../README_resources/Navigate.gif",
+            "../README_resources/noise.gif",
         ]  # Paths to your GIFs
         self.total_gifs = len(self.gifs)
 

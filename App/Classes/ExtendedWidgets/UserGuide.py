@@ -31,9 +31,9 @@ class UserGuideDialog(QDialog):
 
         # GIFs
         self.gifs = [
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/Import__gif.gif",
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/Navigate.gif",
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/noise.gif",
+            "README_resources/Import__gif.gif",
+            "README_resources/Navigate.gif",
+            "README_resources/noise.gif",
         ]  # Paths to your GIFs
 
         # Documentation text
@@ -222,9 +222,9 @@ class UserGuideDialog(QDialog):
 
         # Paths to your GIFs
         self.gifs = [
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/Import__gif.gif",
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/Navigate.gif",
-            "C:/Users/Kareem/Desktop/ImageAlchemy/README_resources/noise.gif",
+            "README_resources/Import__gif.gif",
+            "README_resources/Navigate.gif",
+            "README_resources/noise.gif",
         ]
 
         # Documentation PDFs

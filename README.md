@@ -1,5 +1,5 @@
-# ImageAlchemy
-ImageAlchemy - A PyQT5-based image processing application offering a variety of techniques implemented from scratch without external libraries.
+# exVision
+exVision - A PyQT5-based image processing application offering a variety of techniques implemented from scratch without external libraries.
 
 ![App UI](README_resources/App_UI.png)
 
@@ -19,7 +19,7 @@ ImageAlchemy - A PyQT5-based image processing application offering a variety of 
 - [License](#license)
 
 ## Description
-ImageAlchemy is a comprehensive image processing application developed using PyQT5, providing a range of powerful techniques including grayscale conversion, noise addition, various filters, edge and boundary detection, thresholding, equalization, active contouring using SNAKE Algorithm, and hybrid image creation. Remarkably, all functionalities are implemented from scratch, avoiding dependency on external libraries like OpenCV or Scikit-Image, ensuring a lightweight and self-contained solution for digital image processing needs.
+exVision is a comprehensive image processing application developed using PyQT5, providing a range of powerful techniques including grayscale conversion, noise addition, various filters, edge and boundary detection, thresholding, equalization, active contouring using SNAKE Algorithm, and hybrid image creation. Remarkably, all functionalities are implemented from scratch, avoiding dependency on external libraries like OpenCV or Scikit-Image, ensuring a lightweight and self-contained solution for digital image processing needs.
 
 ## Features
 :white_check_mark: **3 Ways to add an image to the viewport**
@@ -146,9 +146,9 @@ Currently unavailable in the app version provided, this table is under developme
 
 **_Main Files in the root_**:
 
-`ImageAlchemyUI.py`: The user interface file, housing fixed UI components of the application, which can be dynamically modified during runtime. This serves as the primary file executed to launch the application.
+`exVision_Ui.py`: The user interface file, housing fixed UI components of the application, which can be dynamically modified during runtime. This serves as the primary file executed to launch the application.
 
-`ImageAlchemyBackend.py (Backend & Image Class)`: This file encapsulates the core functionality of the application, orchestrating interactions between the user interface and backend processing. Upon user selection of an effect, the backend instantiates the corresponding effect class, passes inputs, retrieves output images, and manages image history by creating instances of the image class and storing relevant attributes and applied effects.
+`exVision_Backend.py (Backend & Image Class)`: This file encapsulates the core functionality of the application, orchestrating interactions between the user interface and backend processing. Upon user selection of an effect, the backend instantiates the corresponding effect class, passes inputs, retrieves output images, and manages image history by creating instances of the image class and storing relevant attributes and applied effects.
 
 `HelperFunctions.py`: As the name suggests, this folder contains the functions that facilitate the application of different effects, especially the Equalizer.</p>
     </td>
@@ -192,8 +192,8 @@ Currently unavailable in the app version provided, this table is under developme
               ├── TabWidget.py
               └── ThemeDialog.py
       ├── HelperFunctions.py
-      ├── ImageAlchemyBackend.py
-      ├── ImageAlchemyUI.py
+      ├── exVision_Backend.py
+      ├── exVision_Ui.py
       ├── [Resources]
           ├── [HoughSamples]
               ├── [Circle]
@@ -225,7 +225,7 @@ To be able to use our app, you can simply follow these steps:
 ```
 pip install -r requirements.txt
 ```
-3. Run the file with the name "ImageAlchemyUI.py"
+3. Run the file with the name "exVision_Ui.py"
 
 ## App Flow: How to use the app?
 

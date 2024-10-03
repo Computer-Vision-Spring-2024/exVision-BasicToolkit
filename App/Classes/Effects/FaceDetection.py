@@ -47,9 +47,7 @@ class FaceDetection(QDoubleClickPushButton):
         self.calculate_images()
 
         self.features_per_window = self.get_number_of_features_per_window()
-        self.detection_models = self.upload_cascade_adaboost(
-            "C:/Users/Kareem/Desktop/ImageAlchemy/App/Classes/Effects/new_model_15_window"
-        )
+        self.detection_models = self.upload_cascade_adaboost("new_model_15_window")
         self.weak_classifiers = self.detection_models["1st"]
         self.weak_classifiers_2 = self.detection_models["2nd"]
         self.weak_classifiers_3 = self.detection_models["3rd"]

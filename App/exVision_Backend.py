@@ -89,7 +89,7 @@ class Image:
         return self.output_img
 
 
-class Backend:
+class exVisionBackend:
     def __init__(self, ui):
         self.ui = ui
 

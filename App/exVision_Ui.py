@@ -9,13 +9,12 @@ import matplotlib.pyplot as plt
 
 # in CMD: pip install qdarkstyle -> pip install pyqtdarktheme
 import qdarktheme
+from Classes.ExtendedWidgets.CustomTabWidget import CustomTabWidget
+from exVision_Backend import exVisionBackend
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCursor, QIcon
-
-from Classes.ExtendedWidgets.CustomTabWidget import CustomTabWidget
-from ImageAlchemyBackend import Backend
 
 
 class Ui_ImgProcessor(object):
@@ -610,13 +609,10 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    # with open("Resources\Themes\BlackTheme.qss", "r") as f:
-    #     stylesheet = f.read()
-    #     app.setStyleSheet(stylesheet)
     ImgProcessor = QtWidgets.QMainWindow()
     ui = Ui_ImgProcessor()
     ui.setupUi(ImgProcessor)
-    backend = Backend(ui)
+    backend = exVisionBackend(ui)
     ImgProcessor.show()
     qdarktheme.setup_theme("dark")
     sys.exit(app.exec_())
