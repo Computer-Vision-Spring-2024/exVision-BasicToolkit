@@ -1,5 +1,5 @@
-# exVision
-exVision - A PyQT5-based image processing application offering a variety of techniques implemented from scratch without external libraries.
+# exVision-BasicToolkit
+BasicToolkit - A PyQT5-based image processing application offering a variety of techniques implemented from scratch without external libraries.
 
 ![App UI](README_resources/App_UI.png)
 
