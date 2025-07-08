@@ -1,0 +1,7 @@
+# Ignore everything in exVision directory
+exVision/*
+exVision/pyvenv.cfg
+
+# But keep these specific items
+!exVision/src/
+!exVision/requirements.txt

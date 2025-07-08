@@ -1,0 +1,9 @@
+matplotlib
+numpy
+PyQt5
+pyqtdarktheme
+qdarkstyle
+scikit-image
+scipy
+Pillow
+opencv-python-headless
